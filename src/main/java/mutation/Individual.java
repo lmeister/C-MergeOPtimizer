@@ -52,6 +52,10 @@ public class Individual {
   public int hashCode() {
     return Objects.hash(contents);
   }
+
+  public void printContents() {
+    this.contents.stream().forEach(l -> System.out.println(l));
+  }
 }
 
 

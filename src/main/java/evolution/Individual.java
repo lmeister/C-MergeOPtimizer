@@ -1,5 +1,6 @@
-package mutation;
+package evolution;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -12,7 +13,13 @@ public class Individual {
   /**
    * Each line equals to an entry in this list
    **/
-  private List<String> contents;
+  private final List<String> contents;
+
+  public File getTestResults() {
+    return testResults;
+  }
+
+  private File testResults;
 
   public Individual(List<String> contents) {
     this.contents = contents;

@@ -1,4 +1,6 @@
-package mutation;
+package evolution.mutation;
+
+import evolution.Individual;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,7 +18,7 @@ import java.util.Random;
  * </ul>
  */
 public class Mutator {
-  private Random rnd;
+  private final Random rnd;
 
   public Mutator() {
     rnd = new Random();
@@ -74,6 +76,7 @@ public class Mutator {
   /**
    * Performs a crossover between two individuals.
    * Will choose random crossover point and take sublist 0, point from parent1 and point, end from parent 2.
+   *
    * @param parent1 First parent to be used for crossover
    * @param parent2 Second parent to be used for crossover
    * @return A new individual, result of crossover

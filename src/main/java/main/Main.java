@@ -1,9 +1,8 @@
 package main;
 
-import mutation.Individual;
-import mutation.Mutator;
+import evolution.Individual;
+import evolution.mutation.Mutator;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Main {

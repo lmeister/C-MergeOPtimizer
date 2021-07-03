@@ -5,11 +5,10 @@ import evolution.Individual;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 /**
- * Resembles a Mutator object.
- * Mutator is responsible for mutating a given individual.
+ * LineBasedMutator class extends the AbstractMutator.
+ * LineBasedMutator performs mutations on a line-basis.
  * Currently the following operations are allowed:
  * <ul>
  *   <li>Removal of a line</li>
@@ -17,22 +16,43 @@ import java.util.Random;
  *   <li>Swapping of a block?</li>
  * </ul>
  */
-public class Mutator {
-  private final Random rnd;
+public class LineBasedMutator extends AbstractMutator {
 
-  public Mutator() {
-    rnd = new Random();
+  /**
+   * Performs a random mutation on the original based on chance and returns a new instance.
+   *
+   * @param original Original individual that is to be mutated
+   * @return Returns a new Individual instance containing the mutant.
+   */
+  @Override
+  public Individual mutate(Individual original) {
+    double random = rnd.nextDouble();
+    // Würfeln und basierend auf Wahrscheinlichkeit jeweilige Mutation ausführen
+
+    return null;
   }
 
-  public Individual deleteRandomLine(Individual individual) {
-    List<String> mutation = new ArrayList<>(individual.getContents());
+  /**
+   * Deletes a random line in given individual and returns a new instance.
+   *
+   * @param original Original individual that is to be mutated
+   * @return new instance of an individual.
+   */
+  private Individual deleteRandomLine(Individual original) {
+    List<String> mutation = new ArrayList<>(original.getContents());
 
     mutation.remove(rnd.nextInt(mutation.size()));
     return new Individual(mutation);
   }
 
-  public Individual swapRandomLines(Individual individual) {
-    List<String> mutation = new ArrayList<>(individual.getContents());
+  /**
+   * Swaps two random lines in given individual and returns a new instance.
+   *
+   * @param original Original individual that is to be mutated
+   * @return new instance of an individual.
+   */
+  private Individual swapRandomLines(Individual original) {
+    List<String> mutation = new ArrayList<>(original.getContents());
 
     int indexFirst = rnd.nextInt(mutation.size());
     int indexSecond = rnd.nextInt(mutation.size());
@@ -41,11 +61,19 @@ public class Mutator {
       indexSecond = rnd.nextInt(mutation.size());
     }
 
-    return swapLines(individual, indexFirst, indexSecond);
+    return swapLines(original, indexFirst, indexSecond);
   }
 
-  public Individual swapLines(Individual individual, int indexFirst, int indexSecond) {
-    List<String> mutation = new ArrayList<>(individual.getContents());
+  /**
+   * Swaps two given lines in given individual and returns a new instance.
+   *
+   * @param original    Original individual that is to be mutated
+   * @param indexFirst  index of the first line
+   * @param indexSecond index of the second line
+   * @return new instance of an individual.
+   */
+  private Individual swapLines(Individual original, int indexFirst, int indexSecond) {
+    List<String> mutation = new ArrayList<>(original.getContents());
     Collections.swap(mutation, indexFirst, indexSecond);
 
     return new Individual(mutation);
@@ -54,15 +82,15 @@ public class Mutator {
   /**
    * Swaps two blocks of given size and returns a mutated individual
    *
-   * @param individual       The individual that is to be mutated
+   * @param original         The individual that is to be mutated
    * @param firstBlockStart  Start index of first block (inclusive)
    * @param firstBlockEnd    End index of first block (inclusive)
    * @param secondBlockStart Start index second first block (inclusive)
    * @param secondBlockEnd   End index of second block (inclusive)
    * @return Mutated individual or null if invalid indices are given
    */
-  public Individual swapBlock(Individual individual, int firstBlockStart, int firstBlockEnd, int secondBlockStart, int secondBlockEnd) {
-    List<String> contents = new ArrayList<>(individual.getContents());
+  private Individual swapBlock(Individual original, int firstBlockStart, int firstBlockEnd, int secondBlockStart, int secondBlockEnd) {
+    List<String> contents = new ArrayList<>(original.getContents());
 
     List<String> mutation = new ArrayList<>(contents.subList(0, firstBlockStart));
     mutation.addAll(contents.subList(secondBlockStart, secondBlockEnd + 1));
@@ -81,7 +109,7 @@ public class Mutator {
    * @param parent2 Second parent to be used for crossover
    * @return A new individual, result of crossover
    */
-  public Individual crossover(Individual parent1, Individual parent2) {
+  private Individual crossover(Individual parent1, Individual parent2) {
     int crossoverPoint = rnd.nextInt(parent1.getContents().size());
     List<String> contents = new ArrayList<>(parent1.getContents().subList(0, crossoverPoint));
     contents.addAll(parent2.getContents().subList(crossoverPoint, parent2.getContents().size()));

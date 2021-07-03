@@ -16,8 +16,8 @@ import java.nio.file.Paths;
  */
 public class TestBasedFitnessEvaluator extends AbstractFitnessEvaluator {
 
-  private double weightPositiveTestCases;
-  private double weightNegativeTestCases;
+  private final double weightPositiveTestCases;
+  private final double weightNegativeTestCases;
 
   public TestBasedFitnessEvaluator(double weightPositiveTestCases,
                                    double weightNegativeTestCases) {

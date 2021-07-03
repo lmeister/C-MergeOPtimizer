@@ -35,13 +35,14 @@ public class Individual {
     Muss man schauen, ob man sich entscheidet nur einen Teil (Den für uns relevanten)
     zu nehmen und dann in die Datei (bzw. eine Kopie einzufügen)
     Oder ob man die gesamte Datei nimmt - Das könnte speichertechnisch echt doof sein
+  */
 
-    /**
-     * Generated equals function.
-     *
-     * @param o The object to be compared to
-     * @return Boolean value, expressing whether the objects are equal or not
-     */
+  /**
+   * Generated equals function.
+   *
+   * @param o The object to be compared to
+   * @return Boolean value, expressing whether the objects are equal or not
+   */
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;

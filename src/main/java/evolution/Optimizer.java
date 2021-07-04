@@ -8,6 +8,9 @@ import evolution.population.Individual;
 import java.util.Optional;
 import java.util.OptionalDouble;
 
+/**
+ * Optimizer Class performs the optimization of the c-code.
+ */
 public class Optimizer {
 
   private final int maxGenerations;
@@ -44,6 +47,7 @@ public class Optimizer {
 
     // Perform genetic algorithm loop
     while (Generation.getGenerationId() <= this.maxGenerations) {
+      System.out.println("Generation: " + Generation.getGenerationId());
       // Check if fittest Individual of the generation meets the target, if so, return it
       Optional<Individual> fittestIndividual = this.generation.getFittestIndividual();
       if (fittestIndividual.isPresent()) {
@@ -78,22 +82,27 @@ public class Optimizer {
     return false;
   }
 
+  /**
+   * Creates the evolved generation, containing the new mutations.
+   *
+   * @return new Generation object.
+   */
   private Generation createEvolvedGeneration() {
-    int invalidCounter = 0; // this is used for evaluation only
-    // perform mutations and create new generation
+    int invalidCounter = 0; // TODO this is used for evaluation only
     Generation newGeneration = new Generation();
 
     while (newGeneration.getPopulationSize() < populationSize) {
       Individual individualToBeMutated = generation.getIndividualByTournamentSelection();
       Individual mutant = mutator.mutate(individualToBeMutated);
       double fitnessOfMutant = evaluator.evaluateFitness(mutant);
-      // this is used for evaluation only - if is unnecessary
+      // TODO this is used for evaluation only - if is unnecessary
       if (!newGeneration.addIndividual(mutant, fitnessOfMutant)) {
-        System.out.println("Created an invalid mutant. Counter: " + invalidCounter);
         invalidCounter++;
       }
     }
 
+    // TODO this is used for evaluation only
+    System.out.println("Created " + invalidCounter + " invalid mutants.");
     return newGeneration;
   }
 

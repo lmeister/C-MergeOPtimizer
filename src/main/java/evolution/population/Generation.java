@@ -58,6 +58,10 @@ public class Generation {
     return fittestIndividual;
   }
 
+  public int getPopulationSize() {
+    return this.individualFitnessMap.size();
+  }
+
   public Individual getIndividualByTournamentSelection() {
     return null;
   }

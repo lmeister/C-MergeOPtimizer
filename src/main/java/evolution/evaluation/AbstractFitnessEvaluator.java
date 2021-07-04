@@ -14,5 +14,5 @@ public abstract class AbstractFitnessEvaluator {
    * @param individual The individual to be evaluated.
    * @return Fitness of the individual. -1 if it fails to compile.
    */
-  protected abstract double evaluateFitness(Individual individual);
+  public abstract double evaluateFitness(Individual individual);
 }

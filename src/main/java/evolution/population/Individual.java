@@ -62,7 +62,7 @@ public class Individual {
   }
 
   public void printContents() {
-    this.contents.stream().forEach(l -> System.out.println(l));
+    this.contents.forEach(System.out::println);
   }
 }
 

@@ -1,6 +1,6 @@
 package evolution.mutation;
 
-import evolution.Individual;
+import evolution.population.Individual;
 
 import java.util.Random;
 

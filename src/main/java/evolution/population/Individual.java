@@ -1,4 +1,4 @@
-package evolution;
+package evolution.population;
 
 import java.io.File;
 import java.util.Collections;

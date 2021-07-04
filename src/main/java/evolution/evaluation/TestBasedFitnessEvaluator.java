@@ -1,6 +1,6 @@
 package evolution.evaluation;
 
-import evolution.Individual;
+import evolution.population.Individual;
 
 import java.io.File;
 import java.io.IOException;

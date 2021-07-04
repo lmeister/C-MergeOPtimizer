@@ -1,5 +1,10 @@
 package main;
 
+import evolution.evaluation.AbstractFitnessEvaluator;
+import evolution.evaluation.TestBasedFitnessEvaluator;
+import evolution.mutation.AbstractMutator;
+import evolution.mutation.LineBasedMutator;
+
 import java.util.List;
 
 public class Main {
@@ -15,4 +20,12 @@ public class Main {
         "6: exit()"
     );
   }
+
+  // create mutator
+  AbstractMutator mutator = new LineBasedMutator();
+  double weightPositive = 0.5;
+  double weightNegative = 1.0;
+  AbstractFitnessEvaluator fitnessEvaluator = new TestBasedFitnessEvaluator(weightPositive, weightNegative);
+
+
 }

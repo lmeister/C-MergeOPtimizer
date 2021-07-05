@@ -88,20 +88,24 @@ public class Optimizer {
    * @return new Generation object.
    */
   private Generation createEvolvedGeneration() {
-    int invalidCounter = 0; // TODO this is used for evaluation only
+    int invalidCounter = 0; // TODO this is used for evaluation only - Maybe replace with logger
     Generation newGeneration = new Generation();
 
     while (newGeneration.getPopulationSize() < populationSize) {
       Individual individualToBeMutated = generation.getIndividualByTournamentSelection();
       Individual mutant = mutator.mutate(individualToBeMutated);
+
+      String identifier = "Gen" + Generation.getGenerationId() + "Ind" + newGeneration.getPopulationSize();
+      mutant.setIdentifier(identifier);
+
       double fitnessOfMutant = evaluator.evaluateFitness(mutant);
-      // TODO this is used for evaluation only - if is unnecessary
+      // TODO this is used for evaluation only - if is unnecessary - Maybe replace with logger
       if (!newGeneration.addIndividual(mutant, fitnessOfMutant)) {
         invalidCounter++;
       }
     }
 
-    // TODO this is used for evaluation only
+    // TODO this is used for evaluation only  - Maybe replace with logger
     System.out.println("Created " + invalidCounter + " invalid mutants.");
     return newGeneration;
   }

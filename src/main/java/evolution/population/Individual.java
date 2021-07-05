@@ -15,6 +15,8 @@ public class Individual {
    **/
   private final List<String> contents;
 
+  private String identifier;
+
   public File getTestResults() {
     return testResults;
   }
@@ -29,6 +31,13 @@ public class Individual {
     return Collections.unmodifiableList(this.contents);
   }
 
+  public void setIdentifier(String identifier) {
+    this.identifier = identifier;
+  }
+
+  public String getIdentifier() {
+    return this.identifier;
+  }
   /*
     TODO
     Wir arbeiten nur in einer Datei?

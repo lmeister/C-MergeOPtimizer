@@ -32,7 +32,7 @@ public class TestBasedFitnessEvaluator extends AbstractFitnessEvaluator {
    * @return Fitness of the individual. -1 if it fails to compile.
    */
   @Override
-  protected double evaluateFitness(Individual individual) {
+  public double evaluateFitness(Individual individual) {
     // TODO: Irgendwo muss das File gespeichert sein, siehe whiteboard
     return (weightPositiveTestCases * countTestCases(true, individual.getTestResults()))
                + (weightNegativeTestCases * countTestCases(false, individual.getTestResults()));
@@ -60,5 +60,14 @@ public class TestBasedFitnessEvaluator extends AbstractFitnessEvaluator {
     }
 
     return occurrences;
+  }
+
+  // Todo How to handle the multiple configurations we will test?
+  // Execute tests for each variant
+  // first protype without different variants, only define TEST macro
+  private boolean executeTests(String file) {
+
+
+    return false;
   }
 }

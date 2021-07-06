@@ -19,6 +19,7 @@ public class Optimizer {
   private final int populationSize;
   private final AbstractMutator mutator;
   private final AbstractFitnessEvaluator evaluator;
+  private final String originalFilePath;
 
   /**
    * Constructor for the optimizer.
@@ -26,15 +27,17 @@ public class Optimizer {
    * @param maxGenerations as termination criterion
    * @param evaluator      Selected fitness evaluator
    * @param mutator        Selected mutator
-   * @param generation     Current population
    */
-  public Optimizer(int maxGenerations, Generation generation, double fitnessGoal, AbstractFitnessEvaluator evaluator, AbstractMutator mutator, int populationSize) {
+  public Optimizer(int maxGenerations, double fitnessGoal,
+                   AbstractFitnessEvaluator evaluator, AbstractMutator mutator,
+                   int populationSize, String originalFilePath) {
     this.maxGenerations = maxGenerations;
-    this.generation = generation;
     this.fitnessGoal = fitnessGoal;
     this.mutator = mutator;
     this.evaluator = evaluator;
     this.populationSize = populationSize;
+    this.originalFilePath = originalFilePath;
+    this.generation = generateInitialPopulation();
   }
 
   /**
@@ -108,6 +111,21 @@ public class Optimizer {
     // TODO this is used for evaluation only  - Maybe replace with logger
     System.out.println("Created " + invalidCounter + " invalid mutants.");
     return newGeneration;
+  }
+
+  /**
+   * Generates the initial population, which are only random mutants of the original file.
+   *
+   * @return new Generation
+   */
+  private Generation generateInitialPopulation() {
+    Individual original = new Individual();
+    Generation generation = new Generation();
+    // Create new mutants as long as populationSize hasn't been reached by this population
+    while (generation.getPopulationSize() < this.populationSize) {
+
+    }
+    return null;
   }
 
 }

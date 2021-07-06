@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
 
 /**
  * TestBasedFitnessEvaluator class.
@@ -67,9 +68,20 @@ public class TestBasedFitnessEvaluator extends AbstractFitnessEvaluator {
   // Todo How to handle the multiple configurations we will test?
   // Execute tests for each variant
   // first protype without different variants, only define TEST macro
-  private boolean executeTests(String file) {
 
+  /**
+   * Executes the given file
+   *
+   * @param fileName Name to the file that should be executed
+   * @param timeOut  Determines after how many milliseconds execution will be canceled
+   * @return true if execution was sucessful, else false
+   * @throws IOException          if I/O error occurs
+   * @throws InterruptedException if the current thread is interrupted while waiting
+   */
+  private boolean executeTests(String fileName, long timeOut) throws IOException, InterruptedException {
+    Process runTests = new ProcessBuilder("./", fileName).start();
+    runTests.waitFor(timeOut, TimeUnit.MILLISECONDS);
 
-    return false;
+    return runTests.exitValue() != 1;
   }
 }

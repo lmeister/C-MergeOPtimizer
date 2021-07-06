@@ -38,6 +38,7 @@ public class Individual {
   public String getIdentifier() {
     return this.identifier;
   }
+
   /*
     TODO
     Wir arbeiten nur in einer Datei?
@@ -45,6 +46,11 @@ public class Individual {
     zu nehmen und dann in die Datei (bzw. eine Kopie einzufügen)
     Oder ob man die gesamte Datei nimmt - Das könnte speichertechnisch echt doof sein
   */
+  // TODO Konstruktor erstellen
+  public Individual() {
+    this.contents = readContents();
+
+  }
 
   /**
    * Generated equals function.
@@ -72,6 +78,10 @@ public class Individual {
 
   public void printContents() {
     this.contents.forEach(System.out::println);
+  }
+
+  private List<String> readContents() {
+    return null;
   }
 }
 

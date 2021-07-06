@@ -34,8 +34,8 @@ public class TestBasedFitnessEvaluator extends AbstractFitnessEvaluator {
   @Override
   public double evaluateFitness(Individual individual) {
     // TODO: Irgendwo muss das File gespeichert sein, siehe whiteboard
-    return (weightPositiveTestCases * countTestCases(true, individual.getTestResults()))
-               + (weightNegativeTestCases * countTestCases(false, individual.getTestResults()));
+    return (weightPositiveTestCases * countTestCases(true, true, individual.getTestResults()))
+               + (weightNegativeTestCases * countTestCases(false, true, individual.getTestResults()));
   }
 
   /**
@@ -43,17 +43,19 @@ public class TestBasedFitnessEvaluator extends AbstractFitnessEvaluator {
    * Reads in the given results file on line-by-line basis.
    *
    * @param positive if true, will search for positive test cases, otherwise negative test cases.
+   * @param passed   if true, will search for passed test cases, else for failed
    * @param results  The file with the test results. Must be in defined format.
    * @return The amount of specified test cases passed
    */
-  private int countTestCases(boolean positive, File results) {
-    String keyword = (positive ? "POS" : "NEG");
+  private int countTestCases(boolean positive, boolean passed, File results) {
+    String type = (positive ? "POS" : "NEG");
+    String criterion = (passed ? "passed" : "failed");
     int occurrences = -1;
 
     try {
       occurrences = Math.toIntExact(
           Files.lines(Paths.get(results.getPath()))
-              .filter(line -> line.contains(keyword))
+              .filter(line -> line.contains(type) && line.contains(criterion))
               .count());
     } catch (IOException e) {
       e.printStackTrace();

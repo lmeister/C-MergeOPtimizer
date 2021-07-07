@@ -1,8 +1,11 @@
 package main;
 
+import evolution.Optimizer;
 import evolution.evaluation.TestBasedFitnessEvaluator;
 import evolution.mutation.LineBasedMutator;
+import evolution.population.Individual;
 
+import java.util.Optional;
 import java.util.Scanner;
 
 public class Main {
@@ -29,6 +32,13 @@ public class Main {
     LineBasedMutator mutator = new LineBasedMutator();
     TestBasedFitnessEvaluator evaluator = new TestBasedFitnessEvaluator(1.0, 1.0);
     double fitnessGoal = evaluator.computeFitness(requiredPositivePasses, requiredNegativePasses);
+
+    Optimizer optimizer;
+
+    Optional<Individual> result = optimizer.optimize();
+    if (result.isPresent()) {
+      result.get().toFile(result.get().);
+    }
   }
 
 }

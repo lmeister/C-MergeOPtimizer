@@ -6,6 +6,7 @@ import evolution.population.Generation;
 import evolution.population.Individual;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Optional;
 
 /**
@@ -27,16 +28,17 @@ public class Optimizer {
    * @param maxGenerations as termination criterion
    * @param evaluator      Selected fitness evaluator
    * @param mutator        Selected mutator
+   * @throws IOException if source file does not exist
    */
   public Optimizer(int maxGenerations, double fitnessGoal,
                    AbstractFitnessEvaluator evaluator, AbstractMutator mutator,
-                   int populationSize, String originalFilePath) {
+                   int populationSize, String originalFilePath) throws IOException {
     this.maxGenerations = maxGenerations;
     this.mutator = mutator;
     this.evaluator = evaluator;
     this.fitnessGoal = fitnessGoal;
     this.populationSize = populationSize;
-    this.originalFilePath = originalFilePath;
+    this.originalFilePath = originalFilePath.trim();
     this.generation = generateInitialPopulation(new File(originalFilePath));
   }
 
@@ -102,6 +104,9 @@ public class Optimizer {
       }
     }
 
+    // clean files of the last generation
+    this.generation.cleanFiles();
+
     // TODO this is used for evaluation only  - Maybe replace with logger
     System.out.println("Created " + invalidCounter + " invalid mutants.");
     return newGeneration;
@@ -112,7 +117,10 @@ public class Optimizer {
    *
    * @return new Generation
    */
-  private Generation generateInitialPopulation(File originalSource) {
+  private Generation generateInitialPopulation(File originalSource) throws IOException {
+    if (!originalSource.exists() || !originalSource.isFile()) {
+      throw new IOException("File does not exist.");
+    }
     Individual original = new Individual(originalSource);
     Generation generation = new Generation(false);
     // Create new mutants as long as populationSize hasn't been reached by this population

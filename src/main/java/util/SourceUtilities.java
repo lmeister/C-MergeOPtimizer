@@ -1,6 +1,11 @@
 package util;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * SourceUtilities class offers the utilities required to work with C-Code.
@@ -17,5 +22,10 @@ public class SourceUtilities {
     String compilerCommand;
 
     return true;
+  }
+
+  private List<String> readContents(File file) throws IOException {
+    return Files.lines(Paths.get(file.getPath()))
+               .collect(Collectors.toList());
   }
 }

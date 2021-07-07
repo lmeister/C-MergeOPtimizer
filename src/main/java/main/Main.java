@@ -1,8 +1,6 @@
 package main;
 
-import evolution.evaluation.AbstractFitnessEvaluator;
 import evolution.evaluation.TestBasedFitnessEvaluator;
-import evolution.mutation.AbstractMutator;
 import evolution.mutation.LineBasedMutator;
 
 import java.util.Scanner;
@@ -15,8 +13,10 @@ public class Main {
     System.out.println("### Welcome to CMOP ###");
     System.out.println("Currently only line based mutation and test based evaluation are supported.");
     System.out.println("We first need to set the configuration.");
-    System.out.println("How many test cases do you require to pass? (Required for fitness goal");
-    int requiredPasses = scn.nextInt();
+    System.out.println("How many positive test cases do you require to pass? (Required for fitness goal");
+    int requiredPositivePasses = scn.nextInt();
+    System.out.println("How many negative test cases do you require to pass? (Required for fitness goal");
+    int requiredNegativePasses = scn.nextInt();
     System.out.println("After how many generations should the process abort? (Recommended: X)"); // TODO
     int maxGenerations = scn.nextInt();
     System.out.println("How big should each generation's population be? (Recommended: X)"); // TODO
@@ -26,9 +26,9 @@ public class Main {
     String originalFilePath = scn.nextLine();
     System.out.println(originalFilePath);
 
-    AbstractMutator mutator = new LineBasedMutator();
-    AbstractFitnessEvaluator evaluator = new TestBasedFitnessEvaluator(1.0, 1.0);
-
+    LineBasedMutator mutator = new LineBasedMutator();
+    TestBasedFitnessEvaluator evaluator = new TestBasedFitnessEvaluator(1.0, 1.0);
+    double fitnessGoal = evaluator.computeFitness(requiredPositivePasses, requiredNegativePasses);
   }
 
 }

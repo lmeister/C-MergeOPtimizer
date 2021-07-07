@@ -47,7 +47,7 @@ public class Individual {
     Oder ob man die gesamte Datei nimmt - Das könnte speichertechnisch echt doof sein
   */
   // TODO Konstruktor erstellen
-  public Individual() {
+  public Individual(File source) {
     this.contents = readContents();
 
   }

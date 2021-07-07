@@ -1,8 +1,9 @@
 package evolution.population;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Optional;
-import java.util.OptionalDouble;
+import java.util.List;
 
 /**
  * This class resembles a generation of individuals.
@@ -14,8 +15,10 @@ public class Generation {
   private static int generationId;
   private final HashMap<Individual, Double> individualFitnessMap;
 
-  public Generation() {
-    generationId++;
+  public Generation(boolean temporary) {
+    if (!temporary) {
+      generationId++;
+    }
     this.individualFitnessMap = new HashMap<>();
   }
 
@@ -43,16 +46,16 @@ public class Generation {
   /**
    * Retrieves the fittest individual of the generation.
    *
-   * @return Optional containing the fittest individual, or empty if none was found
+   * @return null if no individual found (shouldnt happen), else fittest individual
    */
-  public Optional<Individual> getFittestIndividual() {
+  public Individual getFittestIndividual() {
     double bestFitness = -1;
-    Optional<Individual> fittestIndividual = Optional.empty();
+    Individual fittestIndividual = null;
 
     for (Individual individual : individualFitnessMap.keySet()) {
       if (individualFitnessMap.get(individual) != null
-              && individualFitnessMap.get(individual) > bestFitness) {
-        fittestIndividual = Optional.of(individual);
+              && individualFitnessMap.get(individual) >= bestFitness) {
+        fittestIndividual = individual;
       }
     }
     return fittestIndividual;
@@ -62,17 +65,37 @@ public class Generation {
     return this.individualFitnessMap.size();
   }
 
-  public Individual getIndividualByTournamentSelection() {
-    return null;
-  }
-
-
-  public OptionalDouble getFitnessOfIndividual(Individual individual) {
-    OptionalDouble fitness = OptionalDouble.empty();
+  /**
+   * Returns the fitness of given individual
+   *
+   * @param individual
+   * @return -1 if individual not in population, otherwise fitness as double
+   */
+  public double getFitnessOfIndividual(Individual individual) {
     if (this.individualFitnessMap.get(individual) != null) {
-      fitness = OptionalDouble.of(this.individualFitnessMap.get(individual));
+      return this.individualFitnessMap.get(individual);
     }
-    return fitness;
+    return -1;
   }
 
+  /**
+   * Performs tournament selection algorithm to select an individual.
+   * Tournament size is half the population size
+   *
+   * @return the fittest individual of the tournament
+   */
+  public Individual tournamentSelection() {
+    // Create temporary generation
+    Generation tournament = new Generation(true);
+    // Retrieve all Individuals of the generation and shuffle them around
+    List<Individual> candidates = new ArrayList<>(this.individualFitnessMap.keySet());
+    Collections.shuffle(candidates);
+
+    // Perform tournament with half the population
+    for (int i = 0; i < (this.getPopulationSize() / 2); i++) {
+      tournament.addIndividual(candidates.get(i), this.individualFitnessMap.get(candidates.get(i)));
+    }
+
+    return tournament.getFittestIndividual();
+  }
 }

@@ -34,9 +34,14 @@ public class TestBasedFitnessEvaluator extends AbstractFitnessEvaluator {
    */
   @Override
   public double evaluateFitness(Individual individual) {
+    return computeFitness(countTestCases(true, true, individual.getTestResults()),
+        countTestCases(false, true, individual.getTestResults()));
+  }
+
+  public double computeFitness(int positivePasses, int negativePasses) {
     // TODO: Irgendwo muss das File gespeichert sein, siehe whiteboard
-    return (weightPositiveTestCases * countTestCases(true, true, individual.getTestResults()))
-               + (weightNegativeTestCases * countTestCases(false, true, individual.getTestResults()));
+    return (weightPositiveTestCases * positivePasses)
+               + (weightNegativeTestCases * negativePasses);
   }
 
   /**

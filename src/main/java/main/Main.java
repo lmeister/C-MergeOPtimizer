@@ -5,6 +5,7 @@ import evolution.evaluation.TestBasedFitnessEvaluator;
 import evolution.mutation.LineBasedMutator;
 import evolution.population.Individual;
 
+import java.io.IOException;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -29,16 +30,23 @@ public class Main {
     String originalFilePath = scn.nextLine();
     System.out.println(originalFilePath);
 
+    System.out.println("Enter");
+
     LineBasedMutator mutator = new LineBasedMutator();
     TestBasedFitnessEvaluator evaluator = new TestBasedFitnessEvaluator(1.0, 1.0);
     double fitnessGoal = evaluator.computeFitness(requiredPositivePasses, requiredNegativePasses);
 
-    Optimizer optimizer;
+    Optimizer optimizer = null;
 
     Optional<Individual> result = optimizer.optimize();
-    if (result.isPresent()) {
-      result.get().toFile(result.get().);
+    try {
+      if (result.isPresent()) {
+        result.get().toFile();
+      }
+    } catch (IOException exc) {
+      exc.printStackTrace();
     }
+
   }
 
 }

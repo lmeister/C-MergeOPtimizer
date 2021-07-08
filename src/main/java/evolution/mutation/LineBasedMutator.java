@@ -28,8 +28,11 @@ public class LineBasedMutator extends AbstractMutator {
   public Individual mutate(Individual original) {
     double random = rnd.nextDouble();
     // Würfeln und basierend auf Wahrscheinlichkeit jeweilige Mutation ausführen
+    Individual mutant;
 
-    return null;
+    mutant = swapRandomLines(original);
+
+    return mutant;
   }
 
   /**

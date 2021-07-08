@@ -20,7 +20,6 @@ public class Optimizer {
   private final int populationSize;
   private final AbstractMutator mutator;
   private final AbstractFitnessEvaluator evaluator;
-  private final String originalFilePath;
 
   /**
    * Constructor for the optimizer.
@@ -38,8 +37,7 @@ public class Optimizer {
     this.evaluator = evaluator;
     this.fitnessGoal = fitnessGoal;
     this.populationSize = populationSize;
-    this.originalFilePath = originalFilePath.trim();
-    this.generation = generateInitialPopulation(new File(originalFilePath));
+    this.generation = generateInitialPopulation(new File(originalFilePath.trim()));
   }
 
   /**

@@ -1,5 +1,7 @@
 package evolution.population;
 
+import evolution.ManipulationInformationContainer;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -22,6 +24,8 @@ public class Individual {
   private String identifier;
 
   private File file;
+
+  private List<ManipulationInformationContainer> manipulationInformationContainers;
 
   /**
    * Needs to be array to account for variability (different test results for each variant)

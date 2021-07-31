@@ -57,7 +57,7 @@ public class LineBasedMutator extends AbstractMutator {
   private Individual swapRandomLines(Individual original) {
     List<String> mutation = new ArrayList<>(original.getContents());
 
-    int indexFirst = rnd.nextInt(mutation.size());
+    int indexFirst = rnd.nextInt(mutation.size()); // TODO: Anpassen auf die ManipulationInformation
     int indexSecond = rnd.nextInt(mutation.size());
 
     while (indexFirst == indexSecond) {

@@ -31,6 +31,13 @@ Struktur:
 ---> Dadurch müssen wir vielleicht keine Nachbarzeilen anschauen, weil da ja schon welche drin sind?
  */
 
+  /**
+   * Extracts the line numbers and contents from a git diff.
+   *
+   * @param pathToDiff
+   * @return
+   * @throws IOException
+   */
   public List<ManipulationInformationContainer> parseDiff(Path pathToDiff) throws IOException {
     List<ManipulationInformationContainer> result = new ArrayList<ManipulationInformationContainer>();
     List<String> diffContent = Files.readAllLines(pathToDiff);
@@ -50,6 +57,12 @@ Struktur:
     return result;
   }
 
+  /**
+   * Extracts the line number + content from a single diff
+   *
+   * @param diff
+   * @return
+   */
   private Map<Integer, String> extractLinesFromSingleDiff(List<String> diff) {
     // Jeweils die einzelnen Hunks durchgehen
     // Die Zeilen erhalten wir aus dem Hunk header, müssen dann nur durchiterieren und
@@ -68,6 +81,13 @@ Struktur:
     return lineContentMap;
   }
 
+  /**
+   * Extracts Sublists from a given list. Splits list at lines start start with given searchString.
+   *
+   * @param diffContent
+   * @param searchString
+   * @return
+   */
   private List<List<String>> extractSubLists(List<String> diffContent, String searchString) {
     List<Integer> indices = new ArrayList<>();
     List<List<String>> result = new ArrayList<List<String>>();

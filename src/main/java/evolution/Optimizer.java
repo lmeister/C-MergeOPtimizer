@@ -45,7 +45,6 @@ public class Optimizer {
 
     // Create original individual
     this.original = new Individual(new GitDiffParser().parseDiff(pathToDiff));
-    this.original.setIdentifier("_original");
     // Save the original as originalfilename_original
 
 
@@ -124,9 +123,6 @@ public class Optimizer {
     while (newGeneration.getPopulationSize() < populationSize) {
       Individual individualToBeMutated = this.generation.tournamentSelection();
       Individual mutant = mutator.mutate(individualToBeMutated);
-
-      String identifier = "Gen" + Generation.getGenerationId() + "Ind" + newGeneration.getPopulationSize();
-      mutant.setIdentifier(identifier);
 
       double fitnessOfMutant = evaluator.evaluateFitness(mutant);
       // TODO this is used for evaluation only - if is unnecessary - Maybe replace with logger

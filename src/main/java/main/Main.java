@@ -1,10 +1,12 @@
 package main;
 
+import evolution.Configuration;
 import evolution.Optimizer;
 import evolution.evaluation.TestBasedFitnessEvaluator;
 import evolution.mutation.LineBasedMutator;
 import evolution.population.Individual;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.Scanner;
@@ -37,15 +39,17 @@ public class Main {
     double fitnessGoal = evaluator.computeFitness(requiredPositivePasses, requiredNegativePasses);
 
     Optimizer optimizer = null;
-
-    Optional<Individual> result = optimizer.optimize();
+    System.out.println("Enter the Path to the properties file");
+    String propertiesPath = scn.nextLine();
     try {
-      if (result.isPresent()) {
-        result.get().toFile();
-      }
-    } catch (IOException exc) {
-      exc.printStackTrace();
+      Configuration configuration = new Configuration(new File(propertiesPath));
+
+      Optional<Individual> result = optimizer.optimize();
+
+    } catch (IOException e) {
+      System.out.println("Could not locate properties.");
     }
+
 
   }
 

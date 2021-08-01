@@ -9,6 +9,7 @@ import java.util.Properties;
  * Encapsulates several configuration properties.
  */
 public class Configuration {
+  public final static String ORIGINAL = "_original";
   private double weightPositiveTestCases;
   private double weightNegativeTestCases;
 
@@ -19,6 +20,38 @@ public class Configuration {
   private int generationSize;
 
   private File diffFile;
+
+  public double getWeightPositiveTestCases() {
+    return weightPositiveTestCases;
+  }
+
+  public double getWeightNegativeTestCases() {
+    return weightNegativeTestCases;
+  }
+
+  public int getAmountOfPositiveTestCases() {
+    return amountOfPositiveTestCases;
+  }
+
+  public int getAmountOfNegativeTestCases() {
+    return amountOfNegativeTestCases;
+  }
+
+  public int getMaxGenerations() {
+    return maxGenerations;
+  }
+
+  public int getGenerationSize() {
+    return generationSize;
+  }
+
+  public File getDiffFile() {
+    return diffFile;
+  }
+
+  public int getNeighborhoodRange() {
+    return neighborhoodRange;
+  }
 
   private int neighborhoodRange;
 

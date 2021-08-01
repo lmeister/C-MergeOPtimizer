@@ -4,9 +4,12 @@ import evolution.evaluation.AbstractFitnessEvaluator;
 import evolution.mutation.AbstractMutator;
 import evolution.population.Generation;
 import evolution.population.Individual;
+import util.GitDiffParser;
+import util.SourceUtilities;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 
 /**
@@ -21,6 +24,8 @@ public class Optimizer {
   private final AbstractMutator mutator;
   private final AbstractFitnessEvaluator evaluator;
 
+  private Individual original;
+
   /**
    * Constructor for the optimizer.
    *
@@ -31,13 +36,20 @@ public class Optimizer {
    */
   public Optimizer(int maxGenerations, double fitnessGoal,
                    AbstractFitnessEvaluator evaluator, AbstractMutator mutator,
-                   int populationSize, String originalFilePath) throws IOException {
+                   int populationSize, Path pathToDiff) throws IOException {
     this.maxGenerations = maxGenerations;
     this.mutator = mutator;
     this.evaluator = evaluator;
     this.fitnessGoal = fitnessGoal;
     this.populationSize = populationSize;
-    this.generation = generateInitialPopulation(new File(originalFilePath.trim()));
+
+    // Create original individual
+    this.original = new Individual(new GitDiffParser().parseDiff(pathToDiff));
+    this.original.setIdentifier("_original");
+    // Save the original as originalfilename_original
+
+
+    this.generation = generateInitialPopulation(this.original);
   }
 
   /**
@@ -45,8 +57,19 @@ public class Optimizer {
    *
    * @return Optional, containing the accepted individual or an empty optional, if not acceptable solution was found.
    */
-  public Optional<Individual> optimize() {
+  public Optional<Individual> optimize() throws IOException {
     Optional<Individual> result = Optional.empty();
+
+    // Retrieve the relevant files from git diff
+
+    // Copy the original files and add pre-/suffix? original_
+    // Um zu wissen wie es heißt brauchen wir ja dann doch den path in jedem mic, auch wenn überall gleich
+    // können den beim original dann ja hier direkt editieren und das original ranhängen
+    for (ManipulationInformationContainer mic : this.original.getContents()) {
+      // Copy the originals to the target path
+      Files.copy(mic.getPath(),
+          SourceUtilities.appendStringBeforeExtension(mic.getPath(), Configuration.ORIGINAL));
+    }
 
     // Perform genetic algorithm loop
     while (Generation.getGenerationId() <= this.maxGenerations) {
@@ -63,6 +86,16 @@ public class Optimizer {
     }
 
     return result;
+  }
+
+  /**
+   * Serializes the candidate by merging the manipulated lines with the original.
+   * Takes the original files, copies then and then overwrites the lines that are present in the candidate.
+   */
+  public void serializeCandidate(Individual candidate) throws IOException {
+    for (ManipulationInformationContainer mic : candidate.getContents()) {
+      SourceUtilities.mergeMutantWithOriginal(mic);
+    }
   }
 
   /**
@@ -115,11 +148,7 @@ public class Optimizer {
    *
    * @return new Generation
    */
-  private Generation generateInitialPopulation(File originalSource) throws IOException {
-    if (!originalSource.exists() || !originalSource.isFile()) {
-      throw new IOException("File does not exist.");
-    }
-    Individual original = new Individual(originalSource);
+  private Generation generateInitialPopulation(Individual original) throws IOException {
     Generation generation = new Generation(false);
     // Create new mutants as long as populationSize hasn't been reached by this population
     while (generation.getPopulationSize() < this.populationSize) {

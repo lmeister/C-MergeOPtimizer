@@ -1,5 +1,11 @@
 package util;
 
+import evolution.ManipulationInformationContainer;
+
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Parses Git Diffs to extract required Information.
  */
@@ -19,4 +25,9 @@ Struktur:
 ==> Für uns relevant: +x,y - Ab Zeile x bis zeile x+y sind für uns relevante Zeilen an sich (theoretisch etwas weniger)
 ---> Dadurch müssen wir vielleicht keine Nachbarzeilen anschauen, weil da ja schon welche drin sind?
  */
+
+  public List<ManipulationInformationContainer> parseDiff(Path pathToDiff) {
+
+    return new ArrayList<ManipulationInformationContainer>();
+  }
 }

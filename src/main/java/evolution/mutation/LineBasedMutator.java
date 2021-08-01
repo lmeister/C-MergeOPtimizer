@@ -1,9 +1,9 @@
 package evolution.mutation;
 
+import evolution.ManipulationInformationContainer;
 import evolution.population.Individual;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -27,11 +27,13 @@ public class LineBasedMutator extends AbstractMutator {
   @Override
   public Individual mutate(Individual original) {
     double random = rnd.nextDouble();
-    // Würfeln und basierend auf Wahrscheinlichkeit jeweilige Mutation ausführen
-    Individual mutant;
+    Individual mutant = null;
 
-    mutant = swapRandomLines(original);
-
+    if (random < 0.33) {
+      mutant = swapRandomLines(original);
+    } else if (random >= 0.33) {
+      mutant = deleteRandomLine(original);
+    }
     return mutant;
   }
 
@@ -42,9 +44,10 @@ public class LineBasedMutator extends AbstractMutator {
    * @return new instance of an individual.
    */
   private Individual deleteRandomLine(Individual original) {
-    List<String> mutation = new ArrayList<>(original.getContents());
+    List<ManipulationInformationContainer> mutation = new ArrayList<>(original.getContents());
+    ManipulationInformationContainer container = mutation.get(rnd.nextInt(mutation.size()));
 
-    mutation.remove(rnd.nextInt(mutation.size()));
+    container.removeLine(rnd.nextInt(container.getSize()));
     return new Individual(mutation);
   }
 
@@ -55,14 +58,20 @@ public class LineBasedMutator extends AbstractMutator {
    * @return new instance of an individual.
    */
   private Individual swapRandomLines(Individual original) {
-    List<String> mutation = new ArrayList<>(original.getContents());
+    List<ManipulationInformationContainer> mutation = new ArrayList<>(original.getContents());
+    ManipulationInformationContainer container = mutation.get(rnd.nextInt(mutation.size()));
 
-    int indexFirst = rnd.nextInt(mutation.size()); // TODO: Anpassen auf die ManipulationInformation
-    int indexSecond = rnd.nextInt(mutation.size());
+    int indexFirst = rnd.nextInt(container.getSize()); // TODO: Anpassen auf die ManipulationInformation
+    int indexSecond = rnd.nextInt(container.getSize());
 
     while (indexFirst == indexSecond) {
-      indexSecond = rnd.nextInt(mutation.size());
+      indexSecond = rnd.nextInt(container.getSize());
     }
+
+    // Triangular swap
+    String temp = container.getLine(indexFirst);
+    container.update(indexFirst, container.getLine(indexSecond));
+    container.update(indexSecond, temp);
 
     return swapLines(original, indexFirst, indexSecond);
   }
@@ -76,8 +85,13 @@ public class LineBasedMutator extends AbstractMutator {
    * @return new instance of an individual.
    */
   private Individual swapLines(Individual original, int indexFirst, int indexSecond) {
-    List<String> mutation = new ArrayList<>(original.getContents());
-    Collections.swap(mutation, indexFirst, indexSecond);
+    List<ManipulationInformationContainer> mutation = new ArrayList<>(original.getContents());
+    ManipulationInformationContainer container = mutation.get(rnd.nextInt(mutation.size()));
+
+    // Triangular swap
+    String temp = container.getLine(indexFirst);
+    container.update(indexFirst, container.getLine(indexSecond));
+    container.update(indexSecond, temp);
 
     return new Individual(mutation);
   }
@@ -92,17 +106,17 @@ public class LineBasedMutator extends AbstractMutator {
    * @param secondBlockEnd   End index of second block (inclusive)
    * @return Mutated individual or null if invalid indices are given
    */
-  private Individual swapBlock(Individual original, int firstBlockStart, int firstBlockEnd, int secondBlockStart, int secondBlockEnd) {
-    List<String> contents = new ArrayList<>(original.getContents());
-
-    List<String> mutation = new ArrayList<>(contents.subList(0, firstBlockStart));
-    mutation.addAll(contents.subList(secondBlockStart, secondBlockEnd + 1));
-    mutation.addAll(contents.subList(firstBlockEnd + 1, secondBlockStart));
-    mutation.addAll(contents.subList(firstBlockStart, firstBlockEnd + 1));
-    mutation.addAll(contents.subList(secondBlockEnd + 1, contents.size()));
-
-    return new Individual(mutation);
-  }
+//  private Individual swapBlock(Individual original, int firstBlockStart, int firstBlockEnd, int secondBlockStart, int secondBlockEnd) {
+//    List<String> contents = new ArrayList<>(original.getContents());
+//
+//    List<String> mutation = new ArrayList<>(contents.subList(0, firstBlockStart));
+//    mutation.addAll(contents.subList(secondBlockStart, secondBlockEnd + 1));
+//    mutation.addAll(contents.subList(firstBlockEnd + 1, secondBlockStart));
+//    mutation.addAll(contents.subList(firstBlockStart, firstBlockEnd + 1));
+//    mutation.addAll(contents.subList(secondBlockEnd + 1, contents.size()));
+//
+//    return new Individual(mutation);
+//  }
 
   /**
    * Performs a crossover between two individuals.
@@ -112,12 +126,12 @@ public class LineBasedMutator extends AbstractMutator {
    * @param parent2 Second parent to be used for crossover
    * @return A new individual, result of crossover
    */
-  private Individual crossover(Individual parent1, Individual parent2) {
-    int crossoverPoint = rnd.nextInt(parent1.getContents().size());
-    List<String> contents = new ArrayList<>(parent1.getContents().subList(0, crossoverPoint));
-    contents.addAll(parent2.getContents().subList(crossoverPoint, parent2.getContents().size()));
-
-    return new Individual(contents);
-  }
+//  private Individual crossover(Individual parent1, Individual parent2) {
+//    int crossoverPoint = rnd.nextInt(parent1.getContents().size());
+//    List<String> contents = new ArrayList<>(parent1.getContents().subList(0, crossoverPoint));
+//    contents.addAll(parent2.getContents().subList(crossoverPoint, parent2.getContents().size()));
+//
+//    return new Individual(contents);
+//  }
 
 }

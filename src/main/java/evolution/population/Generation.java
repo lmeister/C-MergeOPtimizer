@@ -106,7 +106,7 @@ public class Generation {
   public void cleanFiles() {
     this.individualFitnessMap.keySet().forEach(individual -> {
       try {
-        individual.deleteFile();
+        individual.deleteFiles();
       } catch (IOException e) {
         System.out.println("Could not delete file " + individual.getIdentifier() + ". File not found.");
       }

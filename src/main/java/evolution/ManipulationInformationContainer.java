@@ -20,16 +20,6 @@ public class ManipulationInformationContainer {
    */
   Map<Integer, String> manipulations;
 
-
-  /**
-   * Constructor.
-   *
-   * @param pathToDiff Path to the git diff object, from which the information will be read;
-   */
-  public ManipulationInformationContainer(Path pathToDiff) {
-    // get contents from diff file
-  }
-
   public ManipulationInformationContainer(Path pathToFile, Map<Integer, String> manipulations) {
     this.pathToFile = pathToFile;
     this.manipulations = manipulations;

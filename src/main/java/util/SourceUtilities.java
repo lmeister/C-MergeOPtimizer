@@ -56,6 +56,14 @@ public class SourceUtilities {
     Files.write(original, originalContent, Charset.defaultCharset());
   }
 
+  /**
+   * Appends a given string to a path before the extension.
+   * Example when called with Path "foo/bar/a.c/" and String "_b" -> "foo/bar/a_b.c"
+   *
+   * @param path
+   * @param string
+   * @return
+   */
   public static Path appendStringBeforeExtension(Path path, String string) {
     String extension = path.toString().substring(path.toString().lastIndexOf('.'));
     String pathWithoutExtension = path.toString().substring(0, path.toString().lastIndexOf('.'));

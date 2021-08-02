@@ -61,6 +61,9 @@ public class TestBasedFitnessEvaluator extends AbstractFitnessEvaluator {
         // Wenn fail direkt rausbrechen bzw fitness -1 returnen
         return -1.0;
       }
+      // Files cleanen (result und individual
+      Files.deleteIfExists(Paths.get(Configuration.TEST_RESULT_PATH));
+      individual.deleteFiles();
     }
     return fitness / compilerArgumentList.size();
   }

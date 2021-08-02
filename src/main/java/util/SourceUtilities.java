@@ -22,16 +22,16 @@ public class SourceUtilities {
    *
    * @return a boolean value indicating whether compilation was succesful.
    */
-  public static boolean compile(Individual individual, List<String> compilerArgs) throws IOException {
+  public static boolean compile(Individual individual, List<String> compilerArgs) throws IOException, InterruptedException {
     // First merge the manipulated lines with the original
     for (ManipulationInformationContainer mic : individual.getContents()) {
       mergeMutantWithOriginal(mic);
     }
     // Then compile it
+    Process compile = new ProcessBuilder(compilerArgs).start();
+    compile.waitFor();
 
-    // return true if
-
-    return true;
+    return compile.exitValue() != 1;
   }
 
   /**
@@ -70,60 +70,4 @@ public class SourceUtilities {
     return Paths.get(pathWithoutExtension + string + extension);
   }
 
-  /**
-   * Compiles the source file with given macro definitions.
-   *
-   * @param individual The Individual that will be compiled
-   * @param lmFlag     Indicates whether -lm should be passed as argument
-   * @param macros     Macros can be given with value "MACRO=Value" or simply with "MACRO".
-   * @param source     The source file
-   * @return false if the individual does not compile properly, true if compilation was successful
-   */
-//  private boolean compile(String source, Individual individual, boolean lmFlag, String... macros) throws IOException {
-//    String output = "";
-//
-//    List<String> compilationCommand = getBasicCompilationArgs(source, output);
-//    compilationCommand.add("-D"); // for Macro definition
-//    compilationCommand.addAll(List.of(macros));
-//    if (lmFlag) {
-//      compilationCommand.add("-lm");
-//    }
-//
-//    String outputName = source + "_" + individual.getIdentifier(); // Todo somehow incorporate variant id
-//    Process compilation = new ProcessBuilder(compilationCommand).start();
-//
-//    return compilation.exitValue() != -1;
-//  }
-
-  /**
-   * Compiles the source file.
-   *
-   * @param individual The Individual that will be compiled
-   * @param lmFlag     Indicates whether -lm should be passed as argument
-   * @param source     The source file
-   * @return false if the individual does not compile properly, true if compilation was successful
-   */
-//  private boolean compile(String source, Individual individual, boolean lmFlag) throws IOException {
-//    String output = "";
-//
-//    List<String> compilationCommand = getBasicCompilationArgs(source, output);
-//    if (lmFlag) {
-//      compilationCommand.add("-lm");
-//    }
-//
-//    String outputName = source + "_" + individual.getIdentifier(); // Todo somehow incorporate variant id
-//    Process compilation = new ProcessBuilder(compilationCommand).start();
-//
-//    return compilation.exitValue() != -1;
-//  }
-//
-//  private List<String> getBasicCompilationArgs(String source, String output) {
-//    List<String> compilationCommand = new ArrayList<>();
-//    compilationCommand.add("gcc");
-//    compilationCommand.add("-o");
-//    compilationCommand.add(output);
-//    compilationCommand.add(source);
-//
-//    return compilationCommand;
-//  }
 }

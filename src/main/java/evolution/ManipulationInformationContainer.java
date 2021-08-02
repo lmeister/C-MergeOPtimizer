@@ -11,14 +11,14 @@ public class ManipulationInformationContainer {
   /**
    * This contains the path of the original i.e. source file, used for serializing
    */
-  Path pathToFile;
+  private final Path pathToFile;
 
   /**
    * Key = line number
    * String = line content
    * Allows easy merging into the file
    */
-  Map<Integer, String> manipulations;
+  private final Map<Integer, String> manipulations;
 
   public ManipulationInformationContainer(Path pathToFile, Map<Integer, String> manipulations) {
     this.pathToFile = pathToFile;

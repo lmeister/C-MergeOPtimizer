@@ -10,9 +10,9 @@ public class CompilerArguments {
   /**
    * Each element in this List is structured as "macro1,macro2,macro3"
    */
-  private List<String> variants;
-  private List<String> flags;
-  private String output;
+  private final List<String> variants;
+  private final List<String> flags;
+  private final String output;
 
   public CompilerArguments() {
     Scanner scn = new Scanner(System.in);
@@ -35,18 +35,19 @@ public class CompilerArguments {
    * @return
    */
   public List<List<String>> getArgs() {
-    List<String> beginning = new ArrayList<String>();
+    List<String> beginning = new ArrayList<>();
     beginning.add("gcc");
     beginning.add("-o");
     beginning.add(this.output);
-    List<List<String>> args = new ArrayList<List<String>>();
+    List<List<String>> args = new ArrayList<>();
     for (String variant : variants) {
-      List<String> arguments = new ArrayList<String>();
+      List<String> arguments = new ArrayList<>();
       arguments.addAll(beginning);
       arguments.addAll(flags);
       arguments.add("-D");
       arguments.addAll(Arrays.asList(variant.split(",")));
       arguments.add("TEST");
+      args.add(arguments);
     }
 
     return args;

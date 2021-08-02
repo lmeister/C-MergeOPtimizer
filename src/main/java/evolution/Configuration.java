@@ -13,16 +13,16 @@ import java.util.Properties;
 public class Configuration {
   public final static String ORIGINAL = "_original";
   public static String TEST_RESULT_PATH;
-  private double weightPositiveTestCases;
-  private double weightNegativeTestCases;
+  private final double weightPositiveTestCases;
+  private final double weightNegativeTestCases;
 
-  private int amountOfPositiveTestCases;
-  private int amountOfNegativeTestCases;
+  private final int amountOfPositiveTestCases;
+  private final int amountOfNegativeTestCases;
 
-  private int maxGenerations;
-  private int generationSize;
+  private final int maxGenerations;
+  private final int generationSize;
 
-  private Path diffFile;
+  private final Path diffFile;
 
   public int timeOut;
 
@@ -54,15 +54,9 @@ public class Configuration {
     return diffFile;
   }
 
-  public int getNeighborhoodRange() {
-    return neighborhoodRange;
-  }
-
   public int getTimeOut() {
     return this.timeOut;
   }
-
-  private int neighborhoodRange;
 
   public Configuration(File properties) throws IOException {
     Properties configuration = new Properties();
@@ -79,7 +73,5 @@ public class Configuration {
     TEST_RESULT_PATH = configuration.getProperty("testResultPath");
 
     this.timeOut = Integer.parseInt(configuration.getProperty("timeOut"));
-
-    this.neighborhoodRange = Integer.parseInt(configuration.getProperty("neighborhoodRange"));
   }
 }

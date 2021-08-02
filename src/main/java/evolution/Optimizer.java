@@ -24,9 +24,9 @@ public class Optimizer {
   private final AbstractMutator mutator;
   private final AbstractFitnessEvaluator evaluator;
 
-  private CompilerArguments compilerArguments;
+  private final CompilerArguments compilerArguments;
 
-  private Individual original;
+  private final Individual original;
 
   /**
    * Constructor for the optimizer.
@@ -51,6 +51,9 @@ public class Optimizer {
     this.original = new Individual(parser.parseDiff(pathToDiff));
 
     this.generation = generateInitialPopulation(this.original);
+
+    // Read the compiler arguments
+    this.compilerArguments = new CompilerArguments();
   }
 
   /**
@@ -131,11 +134,9 @@ public class Optimizer {
       }
     }
 
-    // clean files of the last generation
-    this.generation.cleanFiles();
-
     // TODO this is used for evaluation only  - Maybe replace with logger
-    System.out.println("Created " + invalidCounter + " invalid mutants.");
+    System.out.println("Created " + invalidCounter + " invalid mutants in Generation "
+                           + Generation.getGenerationId() + ".");
     return newGeneration;
   }
 
@@ -155,7 +156,7 @@ public class Optimizer {
         System.out.println("Interrupted exception create initial");
       }
     }
-    return null;
+    return generation;
   }
 
 }

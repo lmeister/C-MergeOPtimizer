@@ -39,7 +39,7 @@ Struktur:
    * @throws IOException
    */
   public List<ManipulationInformationContainer> parseDiff(Path pathToDiff) throws IOException {
-    List<ManipulationInformationContainer> result = new ArrayList<ManipulationInformationContainer>();
+    List<ManipulationInformationContainer> result = new ArrayList<>();
     List<String> diffContent = Files.readAllLines(pathToDiff);
 
     // Enthält alle einzelnen diffs (Also jede innere Liste ist ein file)
@@ -67,7 +67,7 @@ Struktur:
     // Jeweils die einzelnen Hunks durchgehen
     // Die Zeilen erhalten wir aus dem Hunk header, müssen dann nur durchiterieren und
     List<List<String>> hunks = extractSubLists(diff, "@@");
-    Map<Integer, String> lineContentMap = new HashMap<Integer, String>();
+    Map<Integer, String> lineContentMap = new HashMap<>();
     for (List<String> hunk : hunks) {
       int startLine = Integer.parseInt(hunk.get(0)
                                            .split(" ")[2] // Retrieves the +x,y part
@@ -90,7 +90,7 @@ Struktur:
    */
   private List<List<String>> extractSubLists(List<String> diffContent, String searchString) {
     List<Integer> indices = new ArrayList<>();
-    List<List<String>> result = new ArrayList<List<String>>();
+    List<List<String>> result = new ArrayList<>();
     for (int i = 0; i < diffContent.size(); i++) {
       if (diffContent.get(i).startsWith(searchString)) {
         indices.add(i);

@@ -1,6 +1,5 @@
 package evolution.population;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -98,18 +97,5 @@ public class Generation {
     }
 
     return tournament.getFittestIndividual();
-  }
-
-  /**
-   * Clears all the files of this generation.
-   */
-  public void cleanFiles() {
-    this.individualFitnessMap.keySet().forEach(individual -> {
-      try {
-        individual.deleteFiles();
-      } catch (IOException e) {
-        System.out.println("Could not delete file " + individual.getIdentifier() + ". File not found.");
-      }
-    });
   }
 }

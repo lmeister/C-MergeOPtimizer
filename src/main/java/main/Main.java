@@ -28,6 +28,7 @@ public class Main {
           new TestBasedFitnessEvaluator(configuration.getWeightPositiveTestCases(),
               configuration.getWeightNegativeTestCases(),
               configuration.getTimeOut());
+
       double fitnessGoal = evaluator.computeFitness(configuration.getAmountOfPositiveTestCases(),
           configuration.getAmountOfNegativeTestCases());
 

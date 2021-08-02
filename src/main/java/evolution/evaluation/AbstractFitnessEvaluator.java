@@ -1,6 +1,9 @@
 package evolution.evaluation;
 
+import evolution.CompilerArguments;
 import evolution.population.Individual;
+
+import java.io.IOException;
 
 /**
  * AbstractFitnessEvaluator.
@@ -14,5 +17,5 @@ public abstract class AbstractFitnessEvaluator {
    * @param individual The individual to be evaluated.
    * @return Fitness of the individual. -1 if it fails to compile.
    */
-  public abstract double evaluateFitness(Individual individual);
+  public abstract double evaluateFitness(Individual individual, CompilerArguments compilerArguments) throws IOException, InterruptedException;
 }

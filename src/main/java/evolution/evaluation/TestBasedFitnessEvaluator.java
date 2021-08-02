@@ -1,11 +1,15 @@
 package evolution.evaluation;
 
+import evolution.CompilerArguments;
+import evolution.Configuration;
 import evolution.population.Individual;
+import util.SourceUtilities;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -20,30 +24,45 @@ public class TestBasedFitnessEvaluator extends AbstractFitnessEvaluator {
   private final double weightPositiveTestCases;
   private final double weightNegativeTestCases;
 
+  private final int timeOut;
+
   public TestBasedFitnessEvaluator(double weightPositiveTestCases,
-                                   double weightNegativeTestCases) {
+                                   double weightNegativeTestCases,
+                                   int timeOut) {
     this.weightNegativeTestCases = weightNegativeTestCases;
     this.weightPositiveTestCases = weightPositiveTestCases;
+    this.timeOut = timeOut;
   }
 
   /**
    * Evaluates the fitness for given individual.
+   * When given multiple variants to test, it will calculate the avg of all the variants.
    *
    * @param individual The individual to be evaluated.
    * @return Fitness of the individual. -1 if it fails to compile.
    */
   @Override
-  public double evaluateFitness(Individual individual) {
+  public double evaluateFitness(Individual individual, CompilerArguments compilerArguments) throws IOException, InterruptedException {
     double fitness = 0.0;
-    // no test results means no compilation
-    if (individual.getTestResults().length == 0) {
-      return -1.0;
+
+    List<List<String>> compilerArgumentList = compilerArguments.getArgs();
+    for (List<String> args : compilerArgumentList) {
+      // Kompilieren
+      if (SourceUtilities.compile(individual, args)) {
+        // Test laufen lassen
+        if (!executeTests(compilerArguments.getOutput(), this.timeOut)) {
+          return -1.0; // Wenn Ausführung failed
+        }
+        // Ergebnis einlesen und auf fitness addieren
+        File testResults = new File(Configuration.TEST_RESULT_PATH);
+        fitness += computeFitness(countTestCases(true, true, testResults),
+            countTestCases(false, true, testResults));
+      } else {
+        // Wenn fail direkt rausbrechen bzw fitness -1 returnen
+        return -1.0;
+      }
     }
-    for (File testResult : individual.getTestResults()) {
-      fitness = computeFitness(countTestCases(true, true, testResult),
-          countTestCases(false, true, testResult));
-    }
-    return fitness / individual.getTestResults().length;
+    return fitness / compilerArgumentList.size();
   }
 
   public double computeFitness(int positivePasses, int negativePasses) {
@@ -91,9 +110,9 @@ public class TestBasedFitnessEvaluator extends AbstractFitnessEvaluator {
    * @throws IOException          if I/O error occurs
    * @throws InterruptedException if the current thread is interrupted while waiting
    */
-  private boolean executeTests(String fileName, long timeOut) throws IOException, InterruptedException {
+  private boolean executeTests(String fileName, int timeOut) throws IOException, InterruptedException {
     Process runTests = new ProcessBuilder("./", fileName).start();
-    runTests.waitFor(timeOut, TimeUnit.MILLISECONDS);
+    runTests.waitFor(timeOut, TimeUnit.SECONDS);
 
     return runTests.exitValue() != 1;
   }

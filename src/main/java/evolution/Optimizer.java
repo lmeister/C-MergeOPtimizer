@@ -24,6 +24,8 @@ public class Optimizer {
   private final AbstractMutator mutator;
   private final AbstractFitnessEvaluator evaluator;
 
+  private CompilerArguments compilerArguments;
+
   private Individual original;
 
   /**
@@ -44,9 +46,9 @@ public class Optimizer {
     this.populationSize = populationSize;
 
     // Create original individual
-    this.original = new Individual(new GitDiffParser().parseDiff(pathToDiff));
-    // Save the original as originalfilename_original
-
+    GitDiffParser parser = new GitDiffParser();
+    // Retrieve the relevant files from git diff
+    this.original = new Individual(parser.parseDiff(pathToDiff));
 
     this.generation = generateInitialPopulation(this.original);
   }
@@ -58,8 +60,6 @@ public class Optimizer {
    */
   public Optional<Individual> optimize() throws IOException {
     Optional<Individual> result = Optional.empty();
-
-    // Retrieve the relevant files from git diff
 
     // Copy the original files and add pre-/suffix? original_
     // Um zu wissen wie es heißt brauchen wir ja dann doch den path in jedem mic, auch wenn überall gleich
@@ -88,16 +88,6 @@ public class Optimizer {
   }
 
   /**
-   * Serializes the candidate by merging the manipulated lines with the original.
-   * Takes the original files, copies then and then overwrites the lines that are present in the candidate.
-   */
-  public void serializeCandidate(Individual candidate) throws IOException {
-    for (ManipulationInformationContainer mic : candidate.getContents()) {
-      SourceUtilities.mergeMutantWithOriginal(mic);
-    }
-  }
-
-  /**
    * Retrieves fitness of candidate solution and compares it to the target
    *
    * @param candidate Individual that is to be checked against target
@@ -113,6 +103,7 @@ public class Optimizer {
 
   /**
    * Creates the evolved generation, containing the new mutations.
+   * Evaluates the individuals
    *
    * @return new Generation object.
    */
@@ -124,7 +115,16 @@ public class Optimizer {
       Individual individualToBeMutated = this.generation.tournamentSelection();
       Individual mutant = mutator.mutate(individualToBeMutated);
 
-      double fitnessOfMutant = evaluator.evaluateFitness(mutant);
+      double fitnessOfMutant = 0;
+      try {
+        fitnessOfMutant = evaluator.evaluateFitness(mutant, compilerArguments);
+      } catch (IOException e) {
+        System.out.println("IO exception create evolved");
+        e.printStackTrace();
+      } catch (InterruptedException e) {
+        System.out.println("Interrupted exception create evolved");
+        e.printStackTrace();
+      }
       // TODO this is used for evaluation only - if is unnecessary - Maybe replace with logger
       if (!newGeneration.addIndividual(mutant, fitnessOfMutant)) {
         invalidCounter++;
@@ -149,7 +149,11 @@ public class Optimizer {
     // Create new mutants as long as populationSize hasn't been reached by this population
     while (generation.getPopulationSize() < this.populationSize) {
       Individual mutant = this.mutator.mutate(original);
-      generation.addIndividual(mutant, evaluator.evaluateFitness(original));
+      try {
+        generation.addIndividual(mutant, evaluator.evaluateFitness(original, compilerArguments));
+      } catch (InterruptedException e) {
+        System.out.println("Interrupted exception create initial");
+      }
     }
     return null;
   }

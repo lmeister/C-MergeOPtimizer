@@ -3,6 +3,8 @@ package evolution;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 /**
@@ -10,6 +12,7 @@ import java.util.Properties;
  */
 public class Configuration {
   public final static String ORIGINAL = "_original";
+  public static String TEST_RESULT_PATH;
   private double weightPositiveTestCases;
   private double weightNegativeTestCases;
 
@@ -19,7 +22,9 @@ public class Configuration {
   private int maxGenerations;
   private int generationSize;
 
-  private File diffFile;
+  private Path diffFile;
+
+  public int timeOut;
 
   public double getWeightPositiveTestCases() {
     return weightPositiveTestCases;
@@ -45,12 +50,16 @@ public class Configuration {
     return generationSize;
   }
 
-  public File getDiffFile() {
+  public Path getDiffPath() {
     return diffFile;
   }
 
   public int getNeighborhoodRange() {
     return neighborhoodRange;
+  }
+
+  public int getTimeOut() {
+    return this.timeOut;
   }
 
   private int neighborhoodRange;
@@ -66,8 +75,10 @@ public class Configuration {
     this.maxGenerations = Integer.parseInt(configuration.getProperty("maxGenerations"));
     this.generationSize = Integer.parseInt(configuration.getProperty("generationSize"));
 
-    this.diffFile = new File(configuration.getProperty("diffFilePath"));
+    this.diffFile = Paths.get(configuration.getProperty("diffFilePath"));
+    TEST_RESULT_PATH = configuration.getProperty("testResultPath");
 
+    this.timeOut = Integer.parseInt(configuration.getProperty("timeOut"));
 
     this.neighborhoodRange = Integer.parseInt(configuration.getProperty("neighborhoodRange"));
   }

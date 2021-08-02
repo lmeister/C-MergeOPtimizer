@@ -2,8 +2,8 @@ package util;
 
 import evolution.Configuration;
 import evolution.ManipulationInformationContainer;
+import evolution.population.Individual;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -11,7 +11,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * SourceUtilities class offers the utilities required to work with C-Code.
@@ -23,16 +22,16 @@ public class SourceUtilities {
    *
    * @return a boolean value indicating whether compilation was succesful.
    */
-  public static boolean compile(File source, File target) {
-    // TODO this should be initialized with the given compiler args
-    String compilerCommand;
+  public static boolean compile(Individual individual, List<String> compilerArgs) throws IOException {
+    // First merge the manipulated lines with the original
+    for (ManipulationInformationContainer mic : individual.getContents()) {
+      mergeMutantWithOriginal(mic);
+    }
+    // Then compile it
+
+    // return true if
 
     return true;
-  }
-
-  private List<String> readContents(File file) throws IOException {
-    return Files.lines(Paths.get(file.getPath()))
-               .collect(Collectors.toList());
   }
 
   /**
@@ -53,6 +52,7 @@ public class SourceUtilities {
     }
 
     // Write the file
+    // TODO: Account for file existing + overwrite
     Files.write(original, originalContent, Charset.defaultCharset());
   }
 

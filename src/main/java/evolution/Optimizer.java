@@ -18,15 +18,13 @@ import java.util.Optional;
 public class Optimizer {
 
   private final int maxGenerations;
-  private Generation generation;
   private final double fitnessGoal;
   private final int populationSize;
   private final AbstractMutator mutator;
   private final AbstractFitnessEvaluator evaluator;
-
   private final CompilerArguments compilerArguments;
-
   private final Individual original;
+  private Generation generation;
 
   /**
    * Constructor for the optimizer.
@@ -61,32 +59,35 @@ public class Optimizer {
    *
    * @return Optional, containing the accepted individual or an empty optional, if not acceptable solution was found.
    */
-  public Optional<Individual> optimize() throws IOException {
+  public Optional<Individual> optimize() throws IOException, InterruptedException {
     Optional<Individual> result = Optional.empty();
 
-    // Copy the original files and add pre-/suffix? original_
-    // Um zu wissen wie es heißt brauchen wir ja dann doch den path in jedem mic, auch wenn überall gleich
-    // können den beim original dann ja hier direkt editieren und das original ranhängen
-    for (ManipulationInformationContainer mic : this.original.getContents()) {
-      // Copy the originals to the target path
-      Files.copy(mic.getPath(),
-          SourceUtilities.appendStringBeforeExtension(mic.getPath(), Configuration.ORIGINAL));
-    }
-
-    // Perform genetic algorithm loop
-    while (Generation.getGenerationId() <= this.maxGenerations) {
-      System.out.println("Generation: " + Generation.getGenerationId());
-      // Check if fittest Individual of the generation meets the target, if so, return it
-      Individual fittestIndividual = this.generation.getFittestIndividual();
-      if (fittestIndividual != null) {
-        if (checkIfGoalMet(fittestIndividual)) {
-          return Optional.of(fittestIndividual);
-        }
+    // First check if original meets the goal
+    if (this.evaluator.evaluateFitness(original, compilerArguments) >= fitnessGoal) {
+      result = Optional.of(this.original);
+    } else {
+      // Copy the original files and add pre-/suffix? original_
+      // Um zu wissen wie es heißt brauchen wir ja dann doch den path in jedem mic, auch wenn überall gleich
+      // können den beim original dann ja hier direkt editieren und das original ranhängen
+      for (ManipulationInformationContainer mic : this.original.getContents()) {
+        // Copy the originals to the target path
+        Files.copy(mic.getPath(),
+            SourceUtilities.appendStringBeforeExtension(mic.getPath(), Configuration.ORIGINAL));
       }
-      // Create a new evolved generation and set it as current generation
-      this.generation = createEvolvedGeneration();
+      // Perform genetic algorithm loop
+      while (Generation.getGenerationId() <= this.maxGenerations) {
+        System.out.println("Generation: " + Generation.getGenerationId());
+        // Check if fittest Individual of the generation meets the target, if so, return it
+        Individual fittestIndividual = this.generation.getFittestIndividual();
+        if (fittestIndividual != null) {
+          if (checkIfGoalMet(fittestIndividual)) {
+            return Optional.of(fittestIndividual);
+          }
+        }
+        // Create a new evolved generation and set it as current generation
+        this.generation = createEvolvedGeneration();
+      }
     }
-
     return result;
   }
 

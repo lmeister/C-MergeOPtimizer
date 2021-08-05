@@ -25,6 +25,7 @@ public class CompilerArguments {
                                        "\nOne line equals to one variant. " +
                                        "The program will automatically define the TEST macro." +
                                        "Entering an empty string will stop the loop");
+
     // Die
   }
 
@@ -68,5 +69,22 @@ public class CompilerArguments {
 
   public String getOutput() {
     return output;
+  }
+
+  public List<String> getMesonBuild() {
+    List<String> build = new ArrayList<>(
+        Arrays.asList(
+            "meson x --buildtype debug --strip -Db_lto=true -Dcompile_server=false -Dbuild_server=false"
+                .split(" ")));
+
+    return build;
+  }
+
+  public List<String> getMesonCompile() {
+    List<String> compile = new ArrayList<>();
+    compile.add("ninja");
+    compile.add("-Cx");
+
+    return compile;
   }
 }

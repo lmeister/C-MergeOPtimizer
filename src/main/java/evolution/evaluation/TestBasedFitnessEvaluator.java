@@ -46,25 +46,26 @@ public class TestBasedFitnessEvaluator extends AbstractFitnessEvaluator {
     double fitness = 0.0;
 
     List<List<String>> compilerArgumentList = compilerArguments.getArgs();
-    for (List<String> args : compilerArgumentList) {
-      // Kompilieren
-      if (SourceUtilities.compile(individual, args)) {
-        // Test laufen lassen
-        if (!executeTests(compilerArguments.getOutput(), this.timeOut)) {
-          return -1.0; // Wenn Ausführung failed
-        }
-        // Ergebnis einlesen und auf fitness addieren
-        File testResults = new File(Configuration.TEST_RESULT_PATH);
-        fitness += computeFitness(countTestCases(true, true, testResults),
-            countTestCases(false, true, testResults));
-      } else {
-        // Wenn fail direkt rausbrechen bzw fitness -1 returnen
+    // TODO disabled for testing meson
+    // for (List<String> args : compilerArgumentList) {
+    // Kompilieren
+    if (SourceUtilities.compile(individual, compilerArguments.getMesonBuild(), compilerArguments.getMesonCompile())) {
+      // Test laufen lassen
+      if (!executeTests(compilerArguments.getOutput(), this.timeOut)) {
+        return -1.0; // Wenn Ausführung failed
+      }
+      // Ergebnis einlesen und auf fitness addieren
+      File testResults = new File(Configuration.TEST_RESULT_PATH);
+      fitness += computeFitness(countTestCases(true, true, testResults),
+          countTestCases(false, true, testResults));
+    } else {
+      // Wenn fail direkt rausbrechen bzw fitness -1 returnen
         return -1.0;
       }
       // Files cleanen (result und individual
       Files.deleteIfExists(Paths.get(Configuration.TEST_RESULT_PATH));
       individual.deleteFiles();
-    }
+    // }
     return fitness / compilerArgumentList.size();
   }
 

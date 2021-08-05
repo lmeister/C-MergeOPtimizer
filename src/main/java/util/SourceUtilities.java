@@ -22,13 +22,16 @@ public class SourceUtilities {
    *
    * @return a boolean value indicating whether compilation was succesful.
    */
-  public static boolean compile(Individual individual, List<String> compilerArgs) throws IOException, InterruptedException {
+  public static boolean compile(Individual individual, List<String> buildArgs, List<String> compileArgs) throws IOException, InterruptedException {
     // First merge the manipulated lines with the original
     for (ManipulationInformationContainer mic : individual.getContents()) {
       mergeMutantWithOriginal(mic);
     }
     // Then compile it
-    Process compile = new ProcessBuilder(compilerArgs).start();
+    //Process compile = new ProcessBuilder(compilerArgs).start();
+    Process build = new ProcessBuilder(buildArgs).start();
+    build.wait();
+    Process compile = new ProcessBuilder(compileArgs).start();
     compile.waitFor();
 
     return compile.exitValue() != 1;

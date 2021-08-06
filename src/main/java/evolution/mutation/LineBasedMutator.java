@@ -30,11 +30,9 @@ public class LineBasedMutator extends AbstractMutator {
     double random = rnd.nextDouble();
     Individual mutant = new Individual(original);
 
-    if (random < 0.33) {
-      System.out.println("Swapping lines");
+    if (random < 0.8) {
       mutant = swapRandomLines(mutant);
-    } else if (random >= 0.33) {
-      System.out.println("Deleting a line");
+    } else if (random >= 0.8) {
       mutant = deleteRandomLine(mutant);
     }
     return mutant;
@@ -71,11 +69,12 @@ public class LineBasedMutator extends AbstractMutator {
     List<ManipulationInformationContainer> mutation = new ArrayList<>(copy.getContents());
     ManipulationInformationContainer container = mutation.get(rnd.nextInt(mutation.size()));
 
-    int indexFirst = rnd.nextInt(container.getSize()); // TODO: Anpassen auf die ManipulationInformation
-    int indexSecond = rnd.nextInt(container.getSize());
+    List<Integer> lines = new ArrayList<>(container.getManipulations().keySet());
+    int indexFirst = lines.get(rnd.nextInt(lines.size()));
+    int indexSecond = lines.get(rnd.nextInt(lines.size()));
 
     while (indexFirst == indexSecond) {
-      indexSecond = rnd.nextInt(container.getSize());
+      indexSecond = lines.get(rnd.nextInt(lines.size()));
     }
 
     System.out.println("Swapping lines " + indexFirst + " and " + indexSecond);

@@ -25,7 +25,6 @@ public class SourceUtilities {
    */
   public static boolean compile(Individual individual, List<String> buildArgs, List<String> compileArgs) throws IOException, InterruptedException {
     // First merge the manipulated lines with the original
-    System.out.println("Compilation called");
     for (ManipulationInformationContainer mic : individual.getContents()) {
       mergeMutantWithOriginal(mic);
     }
@@ -53,15 +52,12 @@ public class SourceUtilities {
   public static void mergeMutantWithOriginal(ManipulationInformationContainer mic) throws IOException {
     Path original = mic.getPath();
     Map<Integer, String> manipulatedLines = mic.getManipulations();
-    System.out.println("Mic entpackt");
     List<String> originalContent =
         Files.readAllLines(appendStringBeforeExtension(original, Configuration.ORIGINAL));
-    System.out.println("Gelesen");
     // Perform the merge
     for (Integer key : manipulatedLines.keySet()) {
       originalContent.set(key - 1, manipulatedLines.get(key));
     }
-    System.out.println("Gemerged");
 
     // Write the file
     // TODO: Account for file existing + overwrite

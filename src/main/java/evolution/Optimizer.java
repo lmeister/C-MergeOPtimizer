@@ -59,6 +59,8 @@ public class Optimizer {
    * @return Optional, containing the accepted individual or an empty optional, if not acceptable solution was found.
    */
   public Optional<Individual> optimize() throws IOException, InterruptedException {
+    System.out.println("===========================================================");
+    System.out.println("Beginning Optimization.\n");
     Optional<Individual> result = Optional.empty();
 
     // Copy the original files and add pre-/suffix? original_
@@ -69,7 +71,6 @@ public class Optimizer {
       Files.copy(mic.getPath(),
           SourceUtilities.appendStringBeforeExtension(mic.getPath(), Configuration.ORIGINAL), StandardCopyOption.REPLACE_EXISTING);
     }
-    System.out.println("Original files have been copied.");
 
     // First check if original meets the goal
     this.generation = new Generation(true);
@@ -81,19 +82,18 @@ public class Optimizer {
       this.generation = generateInitialPopulation(this.original);
 
       // Check if there is a solution in the initial generation already
-      // TODO HIER GEHEN WIR GRAD IRGENDWIE NICHT REIN CHECKIFGOALMET DEBUGGEN
       if (checkIfGoalMet()) {
         return Optional.of(this.generation.getFittestIndividual());
       }
       // Perform genetic algorithm loop
       while (Generation.getGenerationId() <= this.maxGenerations) {
-        System.out.println("Generation: " + Generation.getGenerationId());
+        // Create a new evolved generation and set it as current generation
+        this.generation = createEvolvedGeneration();
+
         // Check if fittest Individual of the generation meets the target, if so, return it
         if (checkIfGoalMet()) {
           return Optional.of(this.generation.getFittestIndividual());
         }
-        // Create a new evolved generation and set it as current generation
-        this.generation = createEvolvedGeneration();
       }
     }
     return result;
@@ -119,32 +119,42 @@ public class Optimizer {
    *
    * @return new Generation object.
    */
-  private Generation createEvolvedGeneration() {
+  private Generation createEvolvedGeneration() throws IOException {
     int invalidCounter = 0; // TODO this is used for evaluation only - Maybe replace with logger
     Generation newGeneration = new Generation(false);
+    System.out.println("Generating Generation: " + Generation.getGenerationId());
 
     while (newGeneration.getPopulationSize() < populationSize) {
       Individual individualToBeMutated = this.generation.tournamentSelection();
-      Individual mutant = mutator.mutate(individualToBeMutated);
+      Individual mutant = new Individual(individualToBeMutated);
+      mutant = this.mutator.mutate(mutant);
 
-      double fitnessOfMutant = 0;
       try {
-        fitnessOfMutant = evaluator.evaluateFitness(mutant, compilerArguments);
-      } catch (IOException e) {
-        System.out.println("IO exception create evolved");
-        e.printStackTrace();
+        double fitnessOfMutant = evaluator.evaluateFitness(mutant, compilerArguments);
+        System.out.println("Fitness: " + fitnessOfMutant);
+        if (fitnessOfMutant >= fitnessGoal) {
+          System.out.println(newGeneration.getPopulationSize());
+          System.out.println("LOG: Generated " + invalidCounter + " in Generation "
+                                 + Generation.getGenerationId() + ".");
+          newGeneration.addIndividual(mutant, fitnessOfMutant);
+          return newGeneration;
+        } else {
+          if (!newGeneration.addIndividual(mutant, fitnessOfMutant)) {
+            // this is used for evaluation only - if is unnecessary - Maybe replace with logger
+            invalidCounter++;
+          }
+          System.out.println("-----------------------------------------------------------");
+        }
+
       } catch (InterruptedException e) {
         System.out.println("Interrupted exception create evolved");
         e.printStackTrace();
       }
-      // TODO this is used for evaluation only - if is unnecessary - Maybe replace with logger
-      if (!newGeneration.addIndividual(mutant, fitnessOfMutant)) {
-        invalidCounter++;
-      }
+
     }
 
     // TODO this is used for evaluation only  - Maybe replace with logger
-    System.out.println("Created " + invalidCounter + " invalid mutants in Generation "
+    System.out.println("LOG: Created " + invalidCounter + " invalid mutants in Generation "
                            + Generation.getGenerationId() + ".");
     return newGeneration;
   }
@@ -156,6 +166,8 @@ public class Optimizer {
    */
   private Generation generateInitialPopulation(Individual original) throws IOException {
     Generation generation = new Generation(false);
+    int invalidCounter = 0; // TODO this is used for evaluation only - Maybe replace with logger
+
     // Create new mutants as long as populationSize hasn't been reached by this population
     while (generation.getPopulationSize() < this.populationSize) {
       System.out.println("Population size: " + generation.getPopulationSize() + ". Generating an individual:");
@@ -164,18 +176,23 @@ public class Optimizer {
       try {
         double fitnessOfMutant = evaluator.evaluateFitness(mutant, compilerArguments);
         System.out.println("Fitness of mutant: " + fitnessOfMutant);
-        generation.addIndividual(mutant, fitnessOfMutant);
+
+        if (!generation.addIndividual(mutant, fitnessOfMutant)) {
+          invalidCounter++;
+        }
         // If we already find a solution, we can already return the generation
         if (fitnessOfMutant >= fitnessGoal) {
           System.out.println(generation.getPopulationSize());
+          System.out.println("LOG: Generated " + invalidCounter + " invalid mutants during initial generation.");
           return generation;
         }
 
       } catch (InterruptedException e) {
         System.out.println("Interrupted exception create initial");
       }
-      System.out.println("--------------------------");
+      System.out.println("-----------------------------------------------------------");
     }
+    System.out.println("LOG: Generated " + invalidCounter + " invalid mutants during initial generation.");
     return generation;
   }
 

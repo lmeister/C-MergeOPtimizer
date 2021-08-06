@@ -32,19 +32,17 @@ public class Main {
       double fitnessGoal = evaluator.computeFitness(configuration.getAmountOfPositiveTestCases(),
           configuration.getAmountOfNegativeTestCases());
 
-      System.out.println("Vor optimizer erstellung");
       Optimizer optimizer = new Optimizer(configuration.getMaxGenerations(),
           fitnessGoal, evaluator, mutator,
           configuration.getGenerationSize(),
           configuration.getDiffPath());
 
-      System.out.println("test");
-
-
       long startTime = System.currentTimeMillis();
+
       Optional<Individual> result = optimizer.optimize();
       long endTime = System.currentTimeMillis();
       // If result is present write it
+      System.out.println("===========================================================");
       if (result.isPresent()) {
         for (ManipulationInformationContainer mic : result.get().getContents()) {
           SourceUtilities.mergeMutantWithOriginal(mic);

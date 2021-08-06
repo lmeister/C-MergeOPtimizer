@@ -65,6 +65,11 @@ public class TestBasedFitnessEvaluator extends AbstractFitnessEvaluator {
       System.out.println("Tests successfully executed");
       // Ergebnis einlesen und auf fitness addieren
       File testResults = new File(Configuration.TEST_RESULT_PATH);
+      if (!testResults.exists()) {
+        System.out.println("No test file");
+      } else {
+        Files.lines(testResults.toPath()).forEach(System.out::println);
+      }
       fitness += computeFitness(countTestCases(true, true, testResults),
           countTestCases(false, true, testResults));
     } else {

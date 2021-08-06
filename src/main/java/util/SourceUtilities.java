@@ -35,13 +35,11 @@ public class SourceUtilities {
     build.directory(new File(Configuration.PROJECT_PATH));
     Process buildProcess = build.start();
     buildProcess.waitFor();
-    System.out.println("Build attempt done");
 
     ProcessBuilder compile = new ProcessBuilder(compileArgs);
     compile.directory(new File(Configuration.PROJECT_PATH));
     Process compileProcess = compile.start();
     compileProcess.waitFor();
-    System.out.println("Compilation attempt done");
 
     return compileProcess.exitValue() != 1;
   }

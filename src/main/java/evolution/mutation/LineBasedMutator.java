@@ -28,12 +28,14 @@ public class LineBasedMutator extends AbstractMutator {
   @Override
   public Individual mutate(Individual original) {
     double random = rnd.nextDouble();
-    Individual mutant = null;
+    Individual mutant = new Individual(original);
 
     if (random < 0.33) {
-      mutant = swapRandomLines(original);
+      System.out.println("Swapping lines");
+      mutant = swapRandomLines(mutant);
     } else if (random >= 0.33) {
-      mutant = deleteRandomLine(original);
+      System.out.println("Deleting a line");
+      mutant = deleteRandomLine(mutant);
     }
     return mutant;
   }
@@ -45,12 +47,14 @@ public class LineBasedMutator extends AbstractMutator {
    * @return new instance of an individual.
    */
   private Individual deleteRandomLine(Individual original) {
-    List<ManipulationInformationContainer> mutation = new ArrayList<>(original.getContents());
+    Individual copy = new Individual(original);
+    List<ManipulationInformationContainer> mutation = new ArrayList<>(copy.getContents());
     ManipulationInformationContainer container = mutation.get(rnd.nextInt(mutation.size()));
 
     List<Integer> lineNumbers = new ArrayList<>(container.getManipulations().keySet());
     Random r = new Random();
     int randomLine = lineNumbers.get(r.nextInt(lineNumbers.size()));
+    System.out.println("Deleting line: " + randomLine);
     container.update(randomLine, "");
 
     return new Individual(mutation);
@@ -63,7 +67,8 @@ public class LineBasedMutator extends AbstractMutator {
    * @return new instance of an individual.
    */
   private Individual swapRandomLines(Individual original) {
-    List<ManipulationInformationContainer> mutation = new ArrayList<>(original.getContents());
+    Individual copy = new Individual(original);
+    List<ManipulationInformationContainer> mutation = new ArrayList<>(copy.getContents());
     ManipulationInformationContainer container = mutation.get(rnd.nextInt(mutation.size()));
 
     int indexFirst = rnd.nextInt(container.getSize()); // TODO: Anpassen auf die ManipulationInformation
@@ -73,12 +78,13 @@ public class LineBasedMutator extends AbstractMutator {
       indexSecond = rnd.nextInt(container.getSize());
     }
 
+    System.out.println("Swapping lines " + indexFirst + " and " + indexSecond);
     // Triangular swap
     String temp = container.getLine(indexFirst);
     container.update(indexFirst, container.getLine(indexSecond));
     container.update(indexSecond, temp);
 
-    return swapLines(original, indexFirst, indexSecond);
+    return swapLines(copy, indexFirst, indexSecond);
   }
 
   /**
@@ -90,15 +96,15 @@ public class LineBasedMutator extends AbstractMutator {
    * @return new instance of an individual.
    */
   private Individual swapLines(Individual original, int indexFirst, int indexSecond) {
-    List<ManipulationInformationContainer> mutation = new ArrayList<>(original.getContents());
-    ManipulationInformationContainer container = mutation.get(rnd.nextInt(mutation.size()));
+    Individual copy = new Individual(original);
+    ManipulationInformationContainer container = new ManipulationInformationContainer(copy.getContents().get(rnd.nextInt(copy.getContents().size())));
 
     // Triangular swap
     String temp = container.getLine(indexFirst);
     container.update(indexFirst, container.getLine(indexSecond));
     container.update(indexSecond, temp);
 
-    return new Individual(mutation);
+    return new Individual(copy);
   }
 
 }

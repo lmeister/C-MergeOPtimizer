@@ -35,7 +35,6 @@ public class Generation {
       this.individualFitnessMap.put(individual, fitness);
       return true;
     }
-
     return false;
   }
 
@@ -55,6 +54,7 @@ public class Generation {
     for (Individual individual : individualFitnessMap.keySet()) {
       if (individualFitnessMap.get(individual) != null
               && individualFitnessMap.get(individual) >= bestFitness) {
+        bestFitness = individualFitnessMap.get(individual);
         fittestIndividual = individual;
       }
     }

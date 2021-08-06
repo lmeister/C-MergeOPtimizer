@@ -4,6 +4,7 @@ import evolution.ManipulationInformationContainer;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -15,7 +16,15 @@ public class Individual {
   private final List<ManipulationInformationContainer> contents;
 
   public Individual(List<ManipulationInformationContainer> contents) {
-    this.contents = contents;
+    this.contents = new ArrayList<ManipulationInformationContainer>(contents);
+  }
+
+  public Individual(Individual individual) {
+    this.contents = new ArrayList<>();
+    for (ManipulationInformationContainer mic : individual.getContents()) {
+      ManipulationInformationContainer copy = new ManipulationInformationContainer(mic);
+      this.contents.add(copy);
+    }
   }
 
   public List<ManipulationInformationContainer> getContents() {

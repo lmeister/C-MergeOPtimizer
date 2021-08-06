@@ -77,12 +77,11 @@ public class CompilerArguments {
   }
 
   public List<String> getMesonBuild() {
-    List<String> build = new ArrayList<>(
+
+    return new ArrayList<>(
         Arrays.asList(
             "meson x --buildtype debug --strip -Db_lto=true -Dcompile_server=false -Dbuild_server=false"
                 .split(" ")));
-
-    return build;
   }
 
   public List<String> getMesonCompile() {

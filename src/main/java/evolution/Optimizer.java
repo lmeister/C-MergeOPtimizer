@@ -61,7 +61,6 @@ public class Optimizer {
   public Optional<Individual> optimize() throws IOException, InterruptedException {
     Optional<Individual> result = Optional.empty();
 
-
     // Copy the original files and add pre-/suffix? original_
     // Um zu wissen wie es heißt brauchen wir ja dann doch den path in jedem mic, auch wenn überall gleich
     // können den beim original dann ja hier direkt editieren und das original ranhängen
@@ -71,23 +70,27 @@ public class Optimizer {
           SourceUtilities.appendStringBeforeExtension(mic.getPath(), Configuration.ORIGINAL), StandardCopyOption.REPLACE_EXISTING);
     }
     System.out.println("Original files have been copied.");
+
     // First check if original meets the goal
-    if (this.evaluator.evaluateFitness(original, compilerArguments) >= fitnessGoal) {
+    this.generation = new Generation(true);
+    this.generation.addIndividual(this.original, this.evaluator.evaluateFitness(original, compilerArguments));
+    if (checkIfGoalMet()) {
       result = Optional.of(this.original);
     } else {
-      System.out.println("pre initial");
+      // if Original does not satisfy the goal, generate initial population
       this.generation = generateInitialPopulation(this.original);
-      System.out.println("post initial");
 
+      // Check if there is a solution in the initial generation already
+      // TODO HIER GEHEN WIR GRAD IRGENDWIE NICHT REIN CHECKIFGOALMET DEBUGGEN
+      if (checkIfGoalMet()) {
+        return Optional.of(this.generation.getFittestIndividual());
+      }
       // Perform genetic algorithm loop
       while (Generation.getGenerationId() <= this.maxGenerations) {
         System.out.println("Generation: " + Generation.getGenerationId());
         // Check if fittest Individual of the generation meets the target, if so, return it
-        Individual fittestIndividual = this.generation.getFittestIndividual();
-        if (fittestIndividual != null) {
-          if (checkIfGoalMet(fittestIndividual)) {
-            return Optional.of(fittestIndividual);
-          }
+        if (checkIfGoalMet()) {
+          return Optional.of(this.generation.getFittestIndividual());
         }
         // Create a new evolved generation and set it as current generation
         this.generation = createEvolvedGeneration();
@@ -102,10 +105,10 @@ public class Optimizer {
    * @param candidate Individual that is to be checked against target
    * @return true if target has been met, otherwise false
    */
-  private boolean checkIfGoalMet(Individual candidate) {
+  private boolean checkIfGoalMet() {
     double fitnessOfFittestIndividual;
     // Check if fittest Individual if present, if yes, calculate fitness and compare to fitnessgoal
-    fitnessOfFittestIndividual = this.generation.getFitnessOfIndividual(candidate);
+    fitnessOfFittestIndividual = this.generation.getFitnessOfIndividual(this.generation.getFittestIndividual());
     // if fitness of fittest individual is present and at least as high as goal, return individual as solution
     return fitnessOfFittestIndividual >= this.fitnessGoal;
   }
@@ -155,14 +158,23 @@ public class Optimizer {
     Generation generation = new Generation(false);
     // Create new mutants as long as populationSize hasn't been reached by this population
     while (generation.getPopulationSize() < this.populationSize) {
-      ;
-      Individual mutant = this.mutator.mutate(original);
+      System.out.println("Population size: " + generation.getPopulationSize() + ". Generating an individual:");
+      Individual mutant = new Individual(original);
+      mutant = this.mutator.mutate(mutant);
       try {
-        generation.addIndividual(mutant, evaluator.evaluateFitness(original, compilerArguments));
-        System.out.println("5");
+        double fitnessOfMutant = evaluator.evaluateFitness(mutant, compilerArguments);
+        System.out.println("Fitness of mutant: " + fitnessOfMutant);
+        generation.addIndividual(mutant, fitnessOfMutant);
+        // If we already find a solution, we can already return the generation
+        if (fitnessOfMutant >= fitnessGoal) {
+          System.out.println(generation.getPopulationSize());
+          return generation;
+        }
+
       } catch (InterruptedException e) {
         System.out.println("Interrupted exception create initial");
       }
+      System.out.println("--------------------------");
     }
     return generation;
   }

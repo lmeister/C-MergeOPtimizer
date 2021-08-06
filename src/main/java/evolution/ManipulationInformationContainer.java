@@ -1,6 +1,8 @@
 package evolution;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -23,6 +25,11 @@ public class ManipulationInformationContainer {
   public ManipulationInformationContainer(Path pathToFile, Map<Integer, String> manipulations) {
     this.pathToFile = pathToFile;
     this.manipulations = manipulations;
+  }
+
+  public ManipulationInformationContainer(ManipulationInformationContainer mic) {
+    this.pathToFile = Paths.get(mic.pathToFile.toString());
+    this.manipulations = new HashMap<>(mic.manipulations);
   }
 
   public String getLine(int line) {

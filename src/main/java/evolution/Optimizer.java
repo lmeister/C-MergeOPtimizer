@@ -10,6 +10,8 @@ import util.SourceUtilities;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -25,6 +27,14 @@ public class Optimizer {
   private final CompilerArguments compilerArguments;
   private final Individual original;
   private Generation generation;
+
+
+  // TODO only for evaluation
+  private List<Integer> invalids = new ArrayList<>();
+
+  public List<Integer> getInvalids() {
+    return invalids;
+  }
 
   /**
    * Constructor for the optimizer.
@@ -132,6 +142,7 @@ public class Optimizer {
         System.out.println("Fitness: " + fitnessOfMutant);
         if (fitnessOfMutant >= fitnessGoal) {
           System.out.println(newGeneration.getPopulationSize());
+          invalids.add(invalidCounter);
           System.out.println("LOG: Generated " + invalidCounter + " in Generation "
                                  + Generation.getGenerationId() + ".");
           newGeneration.addIndividual(mutant, fitnessOfMutant);
@@ -181,6 +192,7 @@ public class Optimizer {
         // If we already find a solution, we can already return the generation
         if (fitnessOfMutant >= fitnessGoal) {
           System.out.println(generation.getPopulationSize());
+          invalids.add(invalidCounter);
           System.out.println("LOG: Generated " + invalidCounter + " invalid mutants during initial generation.");
           return generation;
         }

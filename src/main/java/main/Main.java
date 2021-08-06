@@ -5,6 +5,7 @@ import evolution.ManipulationInformationContainer;
 import evolution.Optimizer;
 import evolution.evaluation.TestBasedFitnessEvaluator;
 import evolution.mutation.LineBasedMutator;
+import evolution.population.Generation;
 import evolution.population.Individual;
 import util.SourceUtilities;
 
@@ -41,10 +42,11 @@ public class Main {
         for (ManipulationInformationContainer mic : result.get().getContents()) {
           SourceUtilities.mergeMutantWithOriginal(mic);
         }
-        System.out.println("Solution found and written.");
+        System.out.println("Solution found and written in Generation " + Generation.getGenerationId() + ".");
       } else {
         System.out.println("No solution found.");
       }
+      System.out.println("Illegal Mutants generated:" + optimizer.getInvalids());
       System.out.println("Time required for optimization: " + ((endTime - startTime) / 1000.0) + " Seconds.");
     } catch (IOException e) {
       System.out.println("Could not read configuration file. Will exit.");

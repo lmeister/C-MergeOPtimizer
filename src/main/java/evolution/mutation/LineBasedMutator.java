@@ -30,9 +30,9 @@ public class LineBasedMutator extends AbstractMutator {
     double random = rnd.nextDouble();
     Individual mutant = new Individual(original);
 
-    if (random < 0.4) {
+    if (random < 0.5) {
       mutant = swapRandomLines(mutant);
-    } else if (random >= 0.6) {
+    } else if (random >= 0.5) {
       mutant = deleteRandomLine(mutant);
     }
     return mutant;

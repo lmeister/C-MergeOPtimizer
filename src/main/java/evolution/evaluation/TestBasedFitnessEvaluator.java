@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -45,28 +44,40 @@ public class TestBasedFitnessEvaluator extends AbstractFitnessEvaluator {
   public double evaluateFitness(Individual individual, CompilerArguments compilerArguments) throws IOException, InterruptedException {
     double fitness = 0.0;
 
-    List<List<String>> compilerArgumentList = compilerArguments.getArgs();
+    // List<List<String>> compilerArgumentList = compilerArguments.getArgs();
     // TODO disabled for testing meson
     // for (List<String> args : compilerArgumentList) {
     // Kompilieren
+    System.out.println("Entered evaluation");
+    if (compilerArguments == null) {
+      System.out.println("compilerArguments is null");
+    }
     if (SourceUtilities.compile(individual, compilerArguments.getMesonBuild(), compilerArguments.getMesonCompile())) {
+      System.out.println("Compilation successful");
       // Test laufen lassen
-      if (!executeTests(compilerArguments.getOutput(), this.timeOut)) {
-        return -1.0; // Wenn Ausführung failed
+      for (String test : compilerArguments.getTests()) {
+        System.out.println("Current test: " + test);
+        if (!executeTests(test, this.timeOut)) {
+          System.out.println("Tests could not be executed");
+          return -1.0; // Wenn Ausführung failed
+        }
       }
+      System.out.println("Tests successfully executed");
       // Ergebnis einlesen und auf fitness addieren
       File testResults = new File(Configuration.TEST_RESULT_PATH);
       fitness += computeFitness(countTestCases(true, true, testResults),
           countTestCases(false, true, testResults));
     } else {
       // Wenn fail direkt rausbrechen bzw fitness -1 returnen
-        return -1.0;
-      }
-      // Files cleanen (result und individual
-      Files.deleteIfExists(Paths.get(Configuration.TEST_RESULT_PATH));
-      individual.deleteFiles();
+      System.out.println("Compilation failed");
+      return -1.0;
+    }
+    // Files cleanen (result und individual
+    Files.deleteIfExists(Paths.get(Configuration.TEST_RESULT_PATH));
+    individual.deleteFiles();
     // }
-    return fitness / compilerArgumentList.size();
+    // return fitness / compilerArgumentList.size();
+    return fitness;
   }
 
   public double computeFitness(int positivePasses, int negativePasses) {
@@ -115,9 +126,13 @@ public class TestBasedFitnessEvaluator extends AbstractFitnessEvaluator {
    * @throws InterruptedException if the current thread is interrupted while waiting
    */
   private boolean executeTests(String fileName, int timeOut) throws IOException, InterruptedException {
-    Process runTests = new ProcessBuilder("./", fileName).start();
-    runTests.waitFor(timeOut, TimeUnit.SECONDS);
+    ProcessBuilder runTests = new ProcessBuilder(fileName);
+    File test = new File(fileName);
+    File testDirectory = test.getParentFile();
+    runTests.directory(testDirectory);
+    Process runTestsProcess = runTests.start();
+    runTestsProcess.waitFor(timeOut, TimeUnit.SECONDS);
 
-    return runTests.exitValue() != 1;
+    return runTestsProcess.exitValue() != 1;
   }
 }

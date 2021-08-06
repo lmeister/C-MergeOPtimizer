@@ -13,6 +13,8 @@ import java.util.Properties;
 public class Configuration {
   public final static String ORIGINAL = "_original";
   public static String TEST_RESULT_PATH;
+  public static String PROJECT_PATH;
+
   private final double weightPositiveTestCases;
   private final double weightNegativeTestCases;
 
@@ -71,6 +73,7 @@ public class Configuration {
 
     this.diffFile = Paths.get(configuration.getProperty("diffFilePath"));
     TEST_RESULT_PATH = configuration.getProperty("testResultPath");
+    PROJECT_PATH = configuration.getProperty("projectPath");
 
     this.timeOut = Integer.parseInt(configuration.getProperty("timeOut"));
   }

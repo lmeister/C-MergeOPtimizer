@@ -7,16 +7,17 @@ import java.util.Scanner;
 
 public class CompilerArguments {
   private final Scanner scn = new Scanner(System.in);
-  /**
-   * Each element in this List is structured as "macro1,macro2,macro3"
-   */
+
   private final List<String> variants;
   private final List<String> flags;
   private final String output;
+  private final List<String> tests;
 
   public CompilerArguments() {
     Scanner scn = new Scanner(System.in);
-    this.output = scn.next();
+    // output, flags and variants are not used for the evaluation using scrcpy
+    // System.out.println("Enter your out path");
+    this.output = "";
     this.flags = readStringList("Enter your flags including the dash. " +
                                     "Entering an empty string will stop the loop.");
     this.variants = readStringList("Enter the macro definitions for the variants that you would like to test." +
@@ -25,9 +26,10 @@ public class CompilerArguments {
                                        "\nOne line equals to one variant. " +
                                        "The program will automatically define the TEST macro." +
                                        "Entering an empty string will stop the loop");
-
-    // Die
+    this.tests = new ArrayList<String>(); // TODO sollte eingelesen werden
+    tests.add("/home/leon/IdeaProjects/C-MergeOPtimizer/optimize/scrcpy/x/app/test_control_event_serialize");
   }
+
 
   /**
    * Forms a list consisting of compilation args. (Flags + macros)
@@ -56,6 +58,9 @@ public class CompilerArguments {
 
 
   private List<String> readStringList(String prompt) {
+    if (!prompt.equals("bla")) {
+      return null;
+    }
     System.out.println(prompt);
     String input;
     List<String> output = new ArrayList<>();
@@ -86,5 +91,9 @@ public class CompilerArguments {
     compile.add("-Cx");
 
     return compile;
+  }
+
+  public List<String> getTests() {
+    return this.tests;
   }
 }

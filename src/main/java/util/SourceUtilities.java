@@ -4,6 +4,7 @@ import evolution.Configuration;
 import evolution.ManipulationInformationContainer;
 import evolution.population.Individual;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -24,17 +25,25 @@ public class SourceUtilities {
    */
   public static boolean compile(Individual individual, List<String> buildArgs, List<String> compileArgs) throws IOException, InterruptedException {
     // First merge the manipulated lines with the original
+    System.out.println("Compilation called");
     for (ManipulationInformationContainer mic : individual.getContents()) {
       mergeMutantWithOriginal(mic);
     }
     // Then compile it
     //Process compile = new ProcessBuilder(compilerArgs).start();
-    Process build = new ProcessBuilder(buildArgs).start();
-    build.wait();
-    Process compile = new ProcessBuilder(compileArgs).start();
-    compile.waitFor();
+    ProcessBuilder build = new ProcessBuilder(buildArgs);
+    build.directory(new File(Configuration.PROJECT_PATH));
+    Process buildProcess = build.start();
+    buildProcess.waitFor();
+    System.out.println("Build attempt done");
 
-    return compile.exitValue() != 1;
+    ProcessBuilder compile = new ProcessBuilder(compileArgs);
+    compile.directory(new File(Configuration.PROJECT_PATH));
+    Process compileProcess = compile.start();
+    compileProcess.waitFor();
+    System.out.println("Compilation attempt done");
+
+    return compileProcess.exitValue() != 1;
   }
 
   /**
@@ -46,13 +55,15 @@ public class SourceUtilities {
   public static void mergeMutantWithOriginal(ManipulationInformationContainer mic) throws IOException {
     Path original = mic.getPath();
     Map<Integer, String> manipulatedLines = mic.getManipulations();
+    System.out.println("Mic entpackt");
     List<String> originalContent =
         Files.readAllLines(appendStringBeforeExtension(original, Configuration.ORIGINAL));
-
+    System.out.println("Gelesen");
     // Perform the merge
     for (Integer key : manipulatedLines.keySet()) {
       originalContent.set(key - 1, manipulatedLines.get(key));
     }
+    System.out.println("Gemerged");
 
     // Write the file
     // TODO: Account for file existing + overwrite

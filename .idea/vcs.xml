@@ -2,6 +2,8 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/backup/scrcpy" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/optimize/post_scrcpy" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/optimize/scrcpy" vcs="Git" />
   </component>
 </project>

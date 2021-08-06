@@ -49,7 +49,7 @@ Struktur:
     for (List<String> diff : diffs) {
       ManipulationInformationContainer mic;
       // Hier den Path extrahieren zunächst
-      Path path = Paths.get(diff.get(0).split(" ")[3]); // 4. Element in dem Array
+      Path path = Paths.get("/home/leon/IdeaProjects/C-MergeOPtimizer/optimize", diff.get(0).split(" ")[3]); // 4. Element in dem Array
       mic = new ManipulationInformationContainer(path, extractLinesFromSingleDiff(diff));
       result.add(mic);
     }
@@ -69,12 +69,16 @@ Struktur:
     List<List<String>> hunks = extractSubLists(diff, "@@");
     Map<Integer, String> lineContentMap = new HashMap<>();
     for (List<String> hunk : hunks) {
-      int startLine = Integer.parseInt(hunk.get(0)
-                                           .split(" ")[2] // Retrieves the +x,y part
-                                           .split(",")[1] // Retrieve +x of +x,y part
-                                           .substring(1)); // Cut off the +, so we only have x
+      String start = hunk.get(0).split(" ")[2]; // Retrieves the +x,y part
+      start = start.split(",")[0]; // Retrieve +x of +x,y part
+      start = start.substring(1); // Cut off the +, so we only have x
+      int startLine = Integer.parseInt(start);
       for (int i = 1; i < hunk.size(); i++) {
-        lineContentMap.put(startLine, hunk.get(i));
+        String content = hunk.get(i);
+        if (content.startsWith("+")) {
+          content = content.substring(1);
+        }
+        lineContentMap.put(startLine, content);
         startLine++;
       }
     }

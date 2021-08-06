@@ -10,6 +10,7 @@ import util.SourceUtilities;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 
 /**
@@ -48,8 +49,6 @@ public class Optimizer {
     // Retrieve the relevant files from git diff
     this.original = new Individual(parser.parseDiff(pathToDiff));
 
-    this.generation = generateInitialPopulation(this.original);
-
     // Read the compiler arguments
     this.compilerArguments = new CompilerArguments();
   }
@@ -62,18 +61,24 @@ public class Optimizer {
   public Optional<Individual> optimize() throws IOException, InterruptedException {
     Optional<Individual> result = Optional.empty();
 
+
+    // Copy the original files and add pre-/suffix? original_
+    // Um zu wissen wie es heißt brauchen wir ja dann doch den path in jedem mic, auch wenn überall gleich
+    // können den beim original dann ja hier direkt editieren und das original ranhängen
+    for (ManipulationInformationContainer mic : this.original.getContents()) {
+      // Copy the originals to the target path
+      Files.copy(mic.getPath(),
+          SourceUtilities.appendStringBeforeExtension(mic.getPath(), Configuration.ORIGINAL), StandardCopyOption.REPLACE_EXISTING);
+    }
+    System.out.println("Original files have been copied.");
     // First check if original meets the goal
     if (this.evaluator.evaluateFitness(original, compilerArguments) >= fitnessGoal) {
       result = Optional.of(this.original);
     } else {
-      // Copy the original files and add pre-/suffix? original_
-      // Um zu wissen wie es heißt brauchen wir ja dann doch den path in jedem mic, auch wenn überall gleich
-      // können den beim original dann ja hier direkt editieren und das original ranhängen
-      for (ManipulationInformationContainer mic : this.original.getContents()) {
-        // Copy the originals to the target path
-        Files.copy(mic.getPath(),
-            SourceUtilities.appendStringBeforeExtension(mic.getPath(), Configuration.ORIGINAL));
-      }
+      System.out.println("pre initial");
+      this.generation = generateInitialPopulation(this.original);
+      System.out.println("post initial");
+
       // Perform genetic algorithm loop
       while (Generation.getGenerationId() <= this.maxGenerations) {
         System.out.println("Generation: " + Generation.getGenerationId());
@@ -150,9 +155,11 @@ public class Optimizer {
     Generation generation = new Generation(false);
     // Create new mutants as long as populationSize hasn't been reached by this population
     while (generation.getPopulationSize() < this.populationSize) {
+      ;
       Individual mutant = this.mutator.mutate(original);
       try {
         generation.addIndividual(mutant, evaluator.evaluateFitness(original, compilerArguments));
+        System.out.println("5");
       } catch (InterruptedException e) {
         System.out.println("Interrupted exception create initial");
       }

@@ -25,10 +25,6 @@ public class ManipulationInformationContainer {
     this.manipulations = manipulations;
   }
 
-  public void removeLine(int line) {
-    this.manipulations.remove(line);
-  }
-
   public String getLine(int line) {
     return this.manipulations.get(line);
   }

@@ -5,6 +5,7 @@ import evolution.population.Individual;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * LineBasedMutator class extends the AbstractMutator.
@@ -47,7 +48,11 @@ public class LineBasedMutator extends AbstractMutator {
     List<ManipulationInformationContainer> mutation = new ArrayList<>(original.getContents());
     ManipulationInformationContainer container = mutation.get(rnd.nextInt(mutation.size()));
 
-    container.removeLine(rnd.nextInt(container.getSize()));
+    List<Integer> lineNumbers = new ArrayList<>(container.getManipulations().keySet());
+    Random r = new Random();
+    int randomLine = lineNumbers.get(r.nextInt(lineNumbers.size()));
+    container.update(randomLine, "");
+
     return new Individual(mutation);
   }
 

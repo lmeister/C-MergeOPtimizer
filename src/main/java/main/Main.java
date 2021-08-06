@@ -24,18 +24,12 @@ public class Main {
       Configuration configuration = new Configuration(properties);
 
       LineBasedMutator mutator = new LineBasedMutator();
-      TestBasedFitnessEvaluator evaluator =
-          new TestBasedFitnessEvaluator(configuration.getWeightPositiveTestCases(),
-              configuration.getWeightNegativeTestCases(),
-              configuration.getTimeOut());
+      TestBasedFitnessEvaluator evaluator = new TestBasedFitnessEvaluator(configuration);
 
       double fitnessGoal = evaluator.computeFitness(configuration.getAmountOfPositiveTestCases(),
           configuration.getAmountOfNegativeTestCases());
 
-      Optimizer optimizer = new Optimizer(configuration.getMaxGenerations(),
-          fitnessGoal, evaluator, mutator,
-          configuration.getGenerationSize(),
-          configuration.getDiffPath());
+      Optimizer optimizer = new Optimizer(fitnessGoal, evaluator, mutator, configuration);
 
       long startTime = System.currentTimeMillis();
 

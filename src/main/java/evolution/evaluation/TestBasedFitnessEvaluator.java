@@ -25,12 +25,10 @@ public class TestBasedFitnessEvaluator extends AbstractFitnessEvaluator {
 
   private final int timeOut;
 
-  public TestBasedFitnessEvaluator(double weightPositiveTestCases,
-                                   double weightNegativeTestCases,
-                                   int timeOut) {
-    this.weightNegativeTestCases = weightNegativeTestCases;
-    this.weightPositiveTestCases = weightPositiveTestCases;
-    this.timeOut = timeOut;
+  public TestBasedFitnessEvaluator(Configuration configuration) {
+    this.weightNegativeTestCases = configuration.getWeightNegativeTestCases();
+    this.weightPositiveTestCases = configuration.getWeightPositiveTestCases();
+    this.timeOut = configuration.getTimeOut();
   }
 
   /**
@@ -48,9 +46,6 @@ public class TestBasedFitnessEvaluator extends AbstractFitnessEvaluator {
     // TODO disabled for testing meson
     // for (List<String> args : compilerArgumentList) {
     // Kompilieren
-    if (compilerArguments == null) {
-      System.out.println("compilerArguments is null");
-    }
     if (SourceUtilities.compile(individual, compilerArguments.getMesonBuild(), compilerArguments.getMesonCompile())) {
       // Test laufen lassen
       for (String test : compilerArguments.getTests()) {
@@ -60,6 +55,7 @@ public class TestBasedFitnessEvaluator extends AbstractFitnessEvaluator {
       }
       // Ergebnis einlesen und auf fitness addieren
       File testResults = new File(Configuration.TEST_RESULT_PATH);
+      Files.lines(Paths.get(Configuration.TEST_RESULT_PATH)).forEach(System.out::println);
       fitness += computeFitness(countTestCases(true, true, testResults),
           countTestCases(false, true, testResults));
     } else {

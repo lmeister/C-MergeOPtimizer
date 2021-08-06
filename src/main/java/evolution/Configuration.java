@@ -26,7 +26,7 @@ public class Configuration {
 
   private final Path diffFile;
 
-  public int timeOut;
+  private int timeOut;
 
   public double getWeightPositiveTestCases() {
     return weightPositiveTestCases;

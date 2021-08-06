@@ -9,7 +9,6 @@ import util.SourceUtilities;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 
@@ -30,24 +29,24 @@ public class Optimizer {
   /**
    * Constructor for the optimizer.
    *
-   * @param maxGenerations as termination criterion
-   * @param evaluator      Selected fitness evaluator
-   * @param mutator        Selected mutator
+   * @param evaluator Selected fitness evaluator
+   * @param mutator   Selected mutator
    * @throws IOException if source file does not exist
    */
-  public Optimizer(int maxGenerations, double fitnessGoal,
-                   AbstractFitnessEvaluator evaluator, AbstractMutator mutator,
-                   int populationSize, Path pathToDiff) throws IOException {
-    this.maxGenerations = maxGenerations;
+  public Optimizer(double fitnessGoal,
+                   AbstractFitnessEvaluator evaluator,
+                   AbstractMutator mutator,
+                   Configuration configuration) throws IOException {
+    this.maxGenerations = configuration.getMaxGenerations();
     this.mutator = mutator;
     this.evaluator = evaluator;
     this.fitnessGoal = fitnessGoal;
-    this.populationSize = populationSize;
+    this.populationSize = configuration.getGenerationSize();
 
     // Create original individual
     GitDiffParser parser = new GitDiffParser();
     // Retrieve the relevant files from git diff
-    this.original = new Individual(parser.parseDiff(pathToDiff));
+    this.original = new Individual(parser.parseDiff(configuration.getDiffPath()));
 
     // Read the compiler arguments
     this.compilerArguments = new CompilerArguments();
@@ -102,7 +101,6 @@ public class Optimizer {
   /**
    * Retrieves fitness of candidate solution and compares it to the target
    *
-   * @param candidate Individual that is to be checked against target
    * @return true if target has been met, otherwise false
    */
   private boolean checkIfGoalMet() {
@@ -122,11 +120,11 @@ public class Optimizer {
   private Generation createEvolvedGeneration() throws IOException {
     int invalidCounter = 0; // TODO this is used for evaluation only - Maybe replace with logger
     Generation newGeneration = new Generation(false);
-    System.out.println("Generating Generation: " + Generation.getGenerationId());
+    System.out.println("GENERATING GENERATION " + Generation.getGenerationId());
 
     while (newGeneration.getPopulationSize() < populationSize) {
-      Individual individualToBeMutated = this.generation.tournamentSelection();
-      Individual mutant = new Individual(individualToBeMutated);
+      Individual mutant = new Individual(this.generation.tournamentSelection());
+      System.out.println("Population Size: " + newGeneration.getPopulationSize() + ". Generating an Individual:");
       mutant = this.mutator.mutate(mutant);
 
       try {
@@ -167,7 +165,7 @@ public class Optimizer {
   private Generation generateInitialPopulation(Individual original) throws IOException {
     Generation generation = new Generation(false);
     int invalidCounter = 0; // TODO this is used for evaluation only - Maybe replace with logger
-
+    System.out.println("GENERATING INITIAL POPULATION");
     // Create new mutants as long as populationSize hasn't been reached by this population
     while (generation.getPopulationSize() < this.populationSize) {
       System.out.println("Population size: " + generation.getPopulationSize() + ". Generating an individual:");

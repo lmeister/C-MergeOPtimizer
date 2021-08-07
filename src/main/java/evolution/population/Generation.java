@@ -31,7 +31,7 @@ public class Generation {
    * @return Boolean value, stating whether the individual was added or not
    */
   public boolean addIndividual(Individual individual, double fitness) {
-    if (fitness != -1) {
+    if (fitness >= 0.0) {
       this.individualFitnessMap.put(individual, fitness);
       return true;
     }

@@ -75,7 +75,7 @@ Struktur:
       int startLine = Integer.parseInt(start);
       for (int i = 1; i < hunk.size(); i++) {
         String content = hunk.get(i);
-        if (content.startsWith("+")) {
+        if (content.length() > 0) {
           content = content.substring(1);
         }
         lineContentMap.put(startLine, content);

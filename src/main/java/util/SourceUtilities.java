@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * SourceUtilities class offers the utilities required to work with C-Code.
@@ -23,7 +24,7 @@ public class SourceUtilities {
    *
    * @return a boolean value indicating whether compilation was succesful.
    */
-  public static boolean compile(Individual individual, List<String> buildArgs, List<String> compileArgs) throws IOException, InterruptedException {
+  public static boolean compile(Individual individual, List<String> buildArgs, List<String> compileArgs, int timeout) throws IOException {
     // First merge the manipulated lines with the original
     for (ManipulationInformationContainer mic : individual.getContents()) {
       mergeMutantWithOriginal(mic);
@@ -33,14 +34,31 @@ public class SourceUtilities {
     ProcessBuilder build = new ProcessBuilder(buildArgs);
     build.directory(new File(Configuration.PROJECT_PATH));
     Process buildProcess = build.start();
-    buildProcess.waitFor();
-
+    try {
+      buildProcess.waitFor(timeout, TimeUnit.SECONDS);
+      // cancel the process and return false if it takes longer than timeout
+      if (buildProcess.isAlive()) {
+        buildProcess.destroy();
+        return false;
+      }
+    } catch (InterruptedException e) {
+      return false;
+    }
+    // TODO Timeout not working as intended?
     ProcessBuilder compile = new ProcessBuilder(compileArgs);
     compile.directory(new File(Configuration.PROJECT_PATH));
     Process compileProcess = compile.start();
-    compileProcess.waitFor();
-
-    return compileProcess.exitValue() != 1;
+    try {
+      compileProcess.waitFor(timeout, TimeUnit.SECONDS);
+      // cancel the process and return false if it takes longer than timeout
+      if (compileProcess.isAlive()) {
+        compileProcess.destroy();
+        return false;
+      }
+    } catch (InterruptedException e) {
+      return false;
+    }
+    return compileProcess.exitValue() == 0;
   }
 
   /**

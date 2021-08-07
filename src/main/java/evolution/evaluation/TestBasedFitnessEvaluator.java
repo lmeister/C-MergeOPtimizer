@@ -46,7 +46,7 @@ public class TestBasedFitnessEvaluator extends AbstractFitnessEvaluator {
     // TODO disabled for testing meson
     // for (List<String> args : compilerArgumentList) {
     // Kompilieren
-    if (SourceUtilities.compile(individual, compilerArguments.getMesonBuild(), compilerArguments.getMesonCompile())) {
+    if (SourceUtilities.compile(individual, compilerArguments.getMesonBuild(), compilerArguments.getMesonCompile(), this.timeOut)) {
       // Test laufen lassen
       for (String test : compilerArguments.getTests()) {
         if (!executeTests(test, this.timeOut)) {
@@ -97,7 +97,7 @@ public class TestBasedFitnessEvaluator extends AbstractFitnessEvaluator {
               .filter(line -> line.contains(type) && line.contains(criterion))
               .count());
     } catch (IOException e) {
-      e.printStackTrace();
+      System.out.println("Test results not located.");
     }
 
     return occurrences;
@@ -116,13 +116,20 @@ public class TestBasedFitnessEvaluator extends AbstractFitnessEvaluator {
    * @throws IOException          if I/O error occurs
    * @throws InterruptedException if the current thread is interrupted while waiting
    */
-  private boolean executeTests(String fileName, int timeOut) throws IOException, InterruptedException {
+  private boolean executeTests(String fileName, int timeOut) throws IOException {
     ProcessBuilder runTests = new ProcessBuilder(fileName);
     File test = new File(fileName);
     File testDirectory = test.getParentFile();
     runTests.directory(testDirectory);
     Process runTestsProcess = runTests.start();
-    runTestsProcess.waitFor(timeOut, TimeUnit.SECONDS);
+    try {
+      runTestsProcess.waitFor(timeOut, TimeUnit.SECONDS);
+      if (runTestsProcess.isAlive()) {
+        runTestsProcess.destroy();
+      }
+    } catch (InterruptedException e) {
+      return false;
+    }
 
     return runTestsProcess.exitValue() != 1;
   }

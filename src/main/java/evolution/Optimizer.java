@@ -27,6 +27,7 @@ public class Optimizer {
   private final CompilerArguments compilerArguments;
   private final Individual original;
   private Generation generation;
+  private Configuration configuration;
 
 
   // TODO only for evaluation
@@ -52,6 +53,8 @@ public class Optimizer {
     this.evaluator = evaluator;
     this.fitnessGoal = fitnessGoal;
     this.populationSize = configuration.getGenerationSize();
+    this.configuration = configuration;
+
 
     // Create original individual
     GitDiffParser parser = new GitDiffParser();
@@ -68,6 +71,8 @@ public class Optimizer {
    * @return Optional, containing the accepted individual or an empty optional, if not acceptable solution was found.
    */
   public Optional<Individual> optimize() throws IOException, InterruptedException {
+    long startTime = System.currentTimeMillis();
+    long runtime = (System.currentTimeMillis() - startTime) / 1000;
     System.out.println("===========================================================");
     System.out.println("Beginning Optimization.\n");
     Optional<Individual> result = Optional.empty();
@@ -83,7 +88,9 @@ public class Optimizer {
 
     // First check if original meets the goal
     this.generation = new Generation(true);
-    this.generation.addIndividual(this.original, this.evaluator.evaluateFitness(original, compilerArguments));
+    double fitness = this.evaluator.evaluateFitness(original, compilerArguments);
+    this.generation.addIndividual(this.original, fitness);
+    System.out.println("Original evaluated, Fitness: " + fitness);
     if (checkIfGoalMet()) {
       result = Optional.of(this.original);
     } else {
@@ -95,7 +102,7 @@ public class Optimizer {
         return Optional.of(this.generation.getFittestIndividual());
       }
       // Perform genetic algorithm loop
-      while (Generation.getGenerationId() <= this.maxGenerations) {
+      while (Generation.getGenerationId() <= this.maxGenerations && runtime <= configuration.getMaxRuntimeInSeconds()) {
         // Create a new evolved generation and set it as current generation
         this.generation = createEvolvedGeneration();
 
@@ -103,6 +110,7 @@ public class Optimizer {
         if (checkIfGoalMet()) {
           return Optional.of(this.generation.getFittestIndividual());
         }
+        runtime = (System.currentTimeMillis() - startTime) / 1000;
       }
     }
     return result;
@@ -143,8 +151,6 @@ public class Optimizer {
         if (fitnessOfMutant >= fitnessGoal) {
           System.out.println(newGeneration.getPopulationSize());
           invalids.add(invalidCounter);
-          System.out.println("LOG: Generated " + invalidCounter + " in Generation "
-                                 + Generation.getGenerationId() + ".");
           newGeneration.addIndividual(mutant, fitnessOfMutant);
           return newGeneration;
         } else {
@@ -193,7 +199,6 @@ public class Optimizer {
         if (fitnessOfMutant >= fitnessGoal) {
           System.out.println(generation.getPopulationSize());
           invalids.add(invalidCounter);
-          System.out.println("LOG: Generated " + invalidCounter + " invalid mutants during initial generation.");
           return generation;
         }
 
@@ -202,7 +207,7 @@ public class Optimizer {
       }
       System.out.println("-----------------------------------------------------------");
     }
-    System.out.println("LOG: Generated " + invalidCounter + " invalid mutants during initial generation.");
+    invalids.add(invalidCounter);
     return generation;
   }
 

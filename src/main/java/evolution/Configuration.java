@@ -23,6 +23,7 @@ public class Configuration {
 
   private final int maxGenerations;
   private final int generationSize;
+  private final int maxRuntimeInSeconds;
 
   private final Path diffFile;
 
@@ -60,6 +61,10 @@ public class Configuration {
     return this.timeOut;
   }
 
+  public int getMaxRuntimeInSeconds() {
+    return this.maxRuntimeInSeconds;
+  }
+
   public Configuration(File properties) throws IOException {
     Properties configuration = new Properties();
     configuration.load(new FileInputStream(properties.getAbsolutePath()));
@@ -70,6 +75,7 @@ public class Configuration {
 
     this.maxGenerations = Integer.parseInt(configuration.getProperty("maxGenerations"));
     this.generationSize = Integer.parseInt(configuration.getProperty("generationSize"));
+    this.maxRuntimeInSeconds = Integer.parseInt(configuration.getProperty("maxRuntimeInSeconds"));
 
     this.diffFile = Paths.get(configuration.getProperty("diffFilePath"));
     TEST_RESULT_PATH = configuration.getProperty("testResultPath");

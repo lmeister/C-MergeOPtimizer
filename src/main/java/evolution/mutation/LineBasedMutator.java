@@ -39,7 +39,7 @@ public class LineBasedMutator extends AbstractMutator {
   }
 
   /**
-   * Deletes a random line in given individual and returns a new instance.
+   * nsfw Deletes a random line in given individual and returns a new instance.
    *
    * @param original Original individual that is to be mutated
    * @return new instance of an individual.
@@ -52,7 +52,7 @@ public class LineBasedMutator extends AbstractMutator {
     List<Integer> lineNumbers = new ArrayList<>(container.getManipulations().keySet());
     Random r = new Random();
     int randomLine = lineNumbers.get(r.nextInt(lineNumbers.size()));
-    System.out.println("Deleting line: " + randomLine);
+    System.out.println("Deleting line: " + randomLine + " in File: " + container.getPath());
     container.update(randomLine, "");
 
     return new Individual(mutation);
@@ -77,7 +77,7 @@ public class LineBasedMutator extends AbstractMutator {
       indexSecond = lines.get(rnd.nextInt(lines.size()));
     }
 
-    System.out.println("Swapping lines " + indexFirst + " and " + indexSecond);
+    System.out.println("Swapping lines " + indexFirst + " and " + indexSecond + " in File: " + container.getPath());
     // Triangular swap
     String temp = container.getLine(indexFirst);
     container.update(indexFirst, container.getLine(indexSecond));

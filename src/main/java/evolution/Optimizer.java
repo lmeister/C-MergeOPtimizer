@@ -171,6 +171,7 @@ public class Optimizer {
     // TODO this is used for evaluation only  - Maybe replace with logger
     System.out.println("LOG: Created " + invalidCounter + " invalid mutants in Generation "
                            + Generation.getGenerationId() + ".");
+    invalids.add(invalidCounter);
     return newGeneration;
   }
 

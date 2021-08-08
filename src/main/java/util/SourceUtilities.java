@@ -1,7 +1,7 @@
 package util;
 
 import evolution.Configuration;
-import evolution.ManipulationInformationContainer;
+import evolution.mutation.ManipulationInformationContainer;
 import evolution.population.Individual;
 
 import java.io.File;

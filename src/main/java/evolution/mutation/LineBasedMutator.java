@@ -1,6 +1,5 @@
 package evolution.mutation;
 
-import evolution.ManipulationInformationContainer;
 import evolution.population.Individual;
 
 import java.util.ArrayList;

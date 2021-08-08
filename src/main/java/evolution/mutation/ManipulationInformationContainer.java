@@ -1,4 +1,4 @@
-package evolution;
+package evolution.mutation;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

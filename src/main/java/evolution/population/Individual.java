@@ -1,6 +1,6 @@
 package evolution.population;
 
-import evolution.ManipulationInformationContainer;
+import evolution.mutation.ManipulationInformationContainer;
 
 import java.io.IOException;
 import java.nio.file.Files;

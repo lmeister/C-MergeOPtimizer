@@ -1,9 +1,6 @@
 package evolution.population;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * This class resembles a generation of individuals.
@@ -97,5 +94,10 @@ public class Generation {
     }
 
     return tournament.getFittestIndividual();
+  }
+
+  // only for logging
+  public OptionalDouble getAverageFitness() {
+    return this.individualFitnessMap.values().stream().mapToDouble(fitness -> fitness).average();
   }
 }

@@ -2,6 +2,7 @@ package evolution;
 
 import evolution.evaluation.AbstractFitnessEvaluator;
 import evolution.mutation.AbstractMutator;
+import evolution.mutation.ManipulationInformationContainer;
 import evolution.population.Generation;
 import evolution.population.Individual;
 import util.GitDiffParser;
@@ -13,6 +14,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalDouble;
 
 /**
  * Optimizer Class performs the optimization of the c-code.
@@ -30,11 +32,16 @@ public class Optimizer {
   private Configuration configuration;
 
 
-  // TODO only for evaluation
+  // only for evaluation
   private List<Integer> invalids = new ArrayList<>();
+  private List<Double> avgFitness = new ArrayList<>();
 
   public List<Integer> getInvalids() {
     return invalids;
+  }
+
+  public List<Double> getAvgFitness() {
+    return avgFitness;
   }
 
   /**
@@ -105,6 +112,13 @@ public class Optimizer {
       while (Generation.getGenerationId() <= this.maxGenerations && runtime <= configuration.getMaxRuntimeInSeconds()) {
         // Create a new evolved generation and set it as current generation
         this.generation = createEvolvedGeneration();
+
+        // Logging: Print average fitness of generation
+        OptionalDouble genAvg = this.generation.getAverageFitness();
+        if (genAvg.isPresent()) {
+          System.out.println("Average fitness of Generation " + Generation.getGenerationId() + ": " + genAvg.getAsDouble());
+          avgFitness.add(genAvg.getAsDouble());
+        }
 
         // Check if fittest Individual of the generation meets the target, if so, return it
         if (checkIfGoalMet()) {
@@ -199,6 +213,9 @@ public class Optimizer {
         // If we already find a solution, we can already return the generation
         if (fitnessOfMutant >= fitnessGoal) {
           System.out.println(generation.getPopulationSize());
+          if (generation.getAverageFitness().isPresent()) {
+            avgFitness.add(generation.getAverageFitness().getAsDouble());
+          }
           invalids.add(invalidCounter);
           return generation;
         }
@@ -207,6 +224,9 @@ public class Optimizer {
         System.out.println("Interrupted exception create initial");
       }
       System.out.println("-----------------------------------------------------------");
+    }
+    if (generation.getAverageFitness().isPresent()) {
+      avgFitness.add(generation.getAverageFitness().getAsDouble());
     }
     invalids.add(invalidCounter);
     return generation;

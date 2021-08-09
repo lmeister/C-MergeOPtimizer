@@ -29,12 +29,12 @@ public class Optimizer {
   private final CompilerArguments compilerArguments;
   private final Individual original;
   private Generation generation;
-  private Configuration configuration;
+  private final Configuration configuration;
 
 
   // only for evaluation
-  private List<Integer> invalids = new ArrayList<>();
-  private List<Double> avgFitness = new ArrayList<>();
+  private final List<Integer> invalids = new ArrayList<>();
+  private final List<Double> avgFitness = new ArrayList<>();
 
   public List<Integer> getInvalids() {
     return invalids;
@@ -45,11 +45,13 @@ public class Optimizer {
   }
 
   /**
-   * Constructor for the optimizer.
+   * Constructor for the Optimizer class.
    *
-   * @param evaluator Selected fitness evaluator
-   * @param mutator   Selected mutator
-   * @throws IOException if source file does not exist
+   * @param fitnessGoal
+   * @param evaluator
+   * @param mutator
+   * @param configuration
+   * @throws IOException if GitDiffParser fails to read diff
    */
   public Optimizer(double fitnessGoal,
                    AbstractFitnessEvaluator evaluator,
@@ -65,6 +67,7 @@ public class Optimizer {
 
     // Create original individual
     GitDiffParser parser = new GitDiffParser();
+
     // Retrieve the relevant files from git diff
     this.original = new Individual(parser.parseDiff(configuration.getDiffPath()));
 
@@ -77,7 +80,7 @@ public class Optimizer {
    *
    * @return Optional, containing the accepted individual or an empty optional, if not acceptable solution was found.
    */
-  public Optional<Individual> optimize() throws IOException, InterruptedException {
+  public Optional<Individual> optimize() throws IOException {
     long startTime = System.currentTimeMillis();
     long runtime = (System.currentTimeMillis() - startTime) / 1000;
     System.out.println("===========================================================");
@@ -85,8 +88,6 @@ public class Optimizer {
     Optional<Individual> result = Optional.empty();
 
     // Copy the original files and add pre-/suffix? original_
-    // Um zu wissen wie es heißt brauchen wir ja dann doch den path in jedem mic, auch wenn überall gleich
-    // können den beim original dann ja hier direkt editieren und das original ranhängen
     for (ManipulationInformationContainer mic : this.original.getContents()) {
       // Copy the originals to the target path
       Files.copy(mic.getPath(),
@@ -144,10 +145,11 @@ public class Optimizer {
   }
 
   /**
-   * Creates the evolved generation, containing the new mutations.
-   * Evaluates the individuals
+   * Generates an evolved generation based on previous generation.
+   * Utilizes tournament selection.
    *
-   * @return new Generation object.
+   * @return Evolved generation - May return early if solution was found.
+   * @throws IOException if evaluation fails
    */
   private Generation createEvolvedGeneration() throws IOException {
     int invalidCounter = 0; // TODO this is used for evaluation only - Maybe replace with logger
@@ -159,26 +161,21 @@ public class Optimizer {
       System.out.println("Population Size: " + newGeneration.getPopulationSize() + ". Generating an Individual:");
       mutant = this.mutator.mutate(mutant);
 
-      try {
-        double fitnessOfMutant = evaluator.evaluateFitness(mutant, compilerArguments);
-        System.out.println("Fitness: " + fitnessOfMutant);
-        if (fitnessOfMutant >= fitnessGoal) {
-          System.out.println(newGeneration.getPopulationSize());
-          invalids.add(invalidCounter);
-          newGeneration.addIndividual(mutant, fitnessOfMutant);
-          return newGeneration;
-        } else {
-          if (!newGeneration.addIndividual(mutant, fitnessOfMutant)) {
-            // this is used for evaluation only - if is unnecessary - Maybe replace with logger
-            invalidCounter++;
-          }
-          System.out.println("-----------------------------------------------------------");
+      double fitnessOfMutant = evaluator.evaluateFitness(mutant, compilerArguments);
+      System.out.println("Fitness: " + fitnessOfMutant);
+      if (fitnessOfMutant >= fitnessGoal) {
+        System.out.println(newGeneration.getPopulationSize());
+        invalids.add(invalidCounter);
+        newGeneration.addIndividual(mutant, fitnessOfMutant);
+        return newGeneration;
+      } else {
+        if (!newGeneration.addIndividual(mutant, fitnessOfMutant)) {
+          // this is used for evaluation only - if is unnecessary - Maybe replace with logger
+          invalidCounter++;
         }
-
-      } catch (InterruptedException e) {
-        System.out.println("Interrupted exception create evolved");
-        e.printStackTrace();
+        System.out.println("-----------------------------------------------------------");
       }
+
 
     }
 
@@ -190,39 +187,38 @@ public class Optimizer {
   }
 
   /**
-   * Generates the initial population, which are only random mutants of the original file.
+   * Generates the initial population, consisting only of mutants of the original.
    *
-   * @return new Generation
+   * @param original The original individual
+   * @return new Generation object containing mutants - May return early if solution is found
+   * @throws IOException if evaluateFitness throws
    */
   private Generation generateInitialPopulation(Individual original) throws IOException {
     Generation generation = new Generation(false);
     int invalidCounter = 0; // TODO this is used for evaluation only - Maybe replace with logger
     System.out.println("GENERATING INITIAL POPULATION");
-    // Create new mutants as long as populationSize hasn't been reached by this population
+    // Create new mutants for as long as populationSize hasn't been reached by this population
     while (generation.getPopulationSize() < this.populationSize) {
       System.out.println("Population size: " + generation.getPopulationSize() + ". Generating an individual:");
       Individual mutant = new Individual(original);
       mutant = this.mutator.mutate(mutant);
-      try {
-        double fitnessOfMutant = evaluator.evaluateFitness(mutant, compilerArguments);
-        System.out.println("Fitness of mutant: " + fitnessOfMutant);
 
-        if (!generation.addIndividual(mutant, fitnessOfMutant)) {
-          invalidCounter++;
-        }
-        // If we already find a solution, we can already return the generation
-        if (fitnessOfMutant >= fitnessGoal) {
-          System.out.println(generation.getPopulationSize());
-          if (generation.getAverageFitness().isPresent()) {
-            avgFitness.add(generation.getAverageFitness().getAsDouble());
-          }
-          invalids.add(invalidCounter);
-          return generation;
-        }
+      double fitnessOfMutant = evaluator.evaluateFitness(mutant, compilerArguments);
+      System.out.println("Fitness of mutant: " + fitnessOfMutant);
 
-      } catch (InterruptedException e) {
-        System.out.println("Interrupted exception create initial");
+      if (!generation.addIndividual(mutant, fitnessOfMutant)) {
+        invalidCounter++;
       }
+      // If we already find a solution, we can already return the generation
+      if (fitnessOfMutant >= fitnessGoal) {
+        System.out.println(generation.getPopulationSize());
+        if (generation.getAverageFitness().isPresent()) {
+          avgFitness.add(generation.getAverageFitness().getAsDouble());
+        }
+        invalids.add(invalidCounter);
+        return generation;
+      }
+
       System.out.println("-----------------------------------------------------------");
     }
     if (generation.getAverageFitness().isPresent()) {

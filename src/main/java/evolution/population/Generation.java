@@ -65,7 +65,7 @@ public class Generation {
   /**
    * Returns the fitness of given individual
    *
-   * @param individual
+   * @param individual The individual in question
    * @return -1 if individual not in population, otherwise fitness as double
    */
   public double getFitnessOfIndividual(Individual individual) {

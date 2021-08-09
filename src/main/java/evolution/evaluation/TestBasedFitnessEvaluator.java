@@ -32,31 +32,33 @@ public class TestBasedFitnessEvaluator extends AbstractFitnessEvaluator {
   }
 
   /**
-   * Evaluates the fitness for given individual.
-   * When given multiple variants to test, it will calculate the avg of all the variants.
-   *
-   * @param individual The individual to be evaluated.
-   * @return Fitness of the individual. -1 if it fails to compile.
+   * @param individual        The individual to be evaluated.
+   * @param compilerArguments The compiler arguments necessary for compilation
+   * @return fitness value. -1 if it does not compile
+   * @throws IOException if files can not be found
    */
   @Override
-  public double evaluateFitness(Individual individual, CompilerArguments compilerArguments) throws IOException, InterruptedException {
+  public double evaluateFitness(Individual individual, CompilerArguments compilerArguments) throws IOException {
     double fitness = 0.0;
 
     // List<List<String>> compilerArgumentList = compilerArguments.getArgs();
     // TODO disabled for testing meson
+    // TODO: This is currently implemented to only test one configuration. When trying to use multiple variants, we should loop over the arguments
     // for (List<String> args : compilerArgumentList) {
-    // Kompilieren
+
+    // Hard coded meson arguments in here
     if (SourceUtilities.compile(individual, compilerArguments.getMesonBuild(), compilerArguments.getMesonCompile(), this.timeOut)) {
-      // Test laufen lassen
+      // run each test
       for (String test : compilerArguments.getTests()) {
         if (!executeTests(test, this.timeOut)) {
-          return -1.0; // Wenn Ausführung failed
+          return -1.0; // if execution fails
         }
       }
-      // Ergebnis einlesen und auf fitness addieren
+      // Read results
       File testResults = new File(Configuration.TEST_RESULT_PATH);
       // Log which test cases have been executed + result
       //Files.lines(Paths.get(Configuration.TEST_RESULT_PATH)).forEach(System.out::println);
+      // Add up fitness
       fitness += computeFitness(countTestCases(true, true, testResults),
           countTestCases(false, true, testResults));
     } else {
@@ -67,6 +69,8 @@ public class TestBasedFitnessEvaluator extends AbstractFitnessEvaluator {
     Files.deleteIfExists(Paths.get(Configuration.TEST_RESULT_PATH));
     individual.deleteFiles();
     // }
+
+    // TODO Currently disabled as we're just testing a single variant on scrcpy
     // return fitness / compilerArgumentList.size();
     return fitness;
   }
@@ -103,18 +107,14 @@ public class TestBasedFitnessEvaluator extends AbstractFitnessEvaluator {
     return occurrences;
   }
 
-  // Todo How to handle the multiple configurations we will test?
-  // Execute tests for each variant
-  // first protype without different variants, only define TEST macro
 
   /**
-   * Executes the given file
+   * Executes given Tests.
    *
-   * @param fileName Name to the file that should be executed
-   * @param timeOut  Determines after how many milliseconds execution will be canceled
-   * @return true if execution was sucessful, else false
-   * @throws IOException          if I/O error occurs
-   * @throws InterruptedException if the current thread is interrupted while waiting
+   * @param fileName file name of test
+   * @param timeOut  timeout in seconds, after whcih testing will be cancelled if not completed
+   * @return boolean whether tests have been successfully executed
+   * @throws IOException if tests can notb e found
    */
   private boolean executeTests(String fileName, int timeOut) throws IOException {
     ProcessBuilder runTests = new ProcessBuilder(fileName);

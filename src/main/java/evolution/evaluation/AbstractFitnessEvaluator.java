@@ -17,5 +17,5 @@ public abstract class AbstractFitnessEvaluator {
    * @param individual The individual to be evaluated.
    * @return Fitness of the individual. -1 if it fails to compile.
    */
-  public abstract double evaluateFitness(Individual individual, CompilerArguments compilerArguments) throws IOException, InterruptedException;
+  public abstract double evaluateFitness(Individual individual, CompilerArguments compilerArguments) throws IOException;
 }

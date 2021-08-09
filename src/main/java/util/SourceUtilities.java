@@ -20,17 +20,26 @@ import java.util.concurrent.TimeUnit;
 public class SourceUtilities {
 
   /**
-   * Will compile given source and output into given target.
+   * Will compile a given Individual according to build and compilation args.
+   * Merges the manipulated lines with the original by reading the original on a line by line basis and overwriting the appropriate lines.
+   * <p>
+   * Will cancel the compilation and build if time taken is longer than defined timeout.
    *
-   * @return a boolean value indicating whether compilation was succesful.
+   * @param individual  The individual that is to be compiled
+   * @param buildArgs   Building Arguments
+   * @param compileArgs Compiling Arguments
+   * @param timeout     Timeout in seconds, after which compilation is cancelled
+   * @return False if individual can not be compiled or built
+   * @throws IOException IOException if it can not be written or original be read
    */
   public static boolean compile(Individual individual, List<String> buildArgs, List<String> compileArgs, int timeout) throws IOException {
     // First merge the manipulated lines with the original
     for (ManipulationInformationContainer mic : individual.getContents()) {
       mergeMutantWithOriginal(mic);
     }
-    // Then compile it
-    //Process compile = new ProcessBuilder(compilerArgs).start();
+
+    // TODO: This has to be adjusted when not used with scrcpy, as not every solution requires a building tool
+    // First build then compile
     ProcessBuilder build = new ProcessBuilder(buildArgs);
     build.directory(new File(Configuration.PROJECT_PATH));
     Process buildProcess = build.start();
@@ -44,7 +53,7 @@ public class SourceUtilities {
     } catch (InterruptedException e) {
       return false;
     }
-    // TODO Timeout not working as intended?
+
     ProcessBuilder compile = new ProcessBuilder(compileArgs);
     compile.directory(new File(Configuration.PROJECT_PATH));
     Process compileProcess = compile.start();
@@ -62,10 +71,10 @@ public class SourceUtilities {
   }
 
   /**
-   * Retrieves the content of the original file and merges it in memory with the manipulated line. Then writes the new file.
+   * Merges the contents of a ManipulationInformationContainer with the corresponding original file.
    *
-   * @param mic ManipulationInformationContainer containing the mutations
-   * @throws IOException
+   * @param mic The manipulationinformationcontainer holding the information
+   * @throws IOException if original can not be read or manipulations not be written
    */
   public static void mergeMutantWithOriginal(ManipulationInformationContainer mic) throws IOException {
     Path original = mic.getPath();
@@ -86,9 +95,9 @@ public class SourceUtilities {
    * Appends a given string to a path before the extension.
    * Example when called with Path "foo/bar/a.c/" and String "_b" -> "foo/bar/a_b.c"
    *
-   * @param path
-   * @param string
-   * @return
+   * @param path   of file
+   * @param string the appended string
+   * @return the merged path
    */
   public static Path appendStringBeforeExtension(Path path, String string) {
     String extension = path.toString().substring(path.toString().lastIndexOf('.'));

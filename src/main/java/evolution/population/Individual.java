@@ -16,7 +16,7 @@ public class Individual {
   private final List<ManipulationInformationContainer> contents;
 
   public Individual(List<ManipulationInformationContainer> contents) {
-    this.contents = new ArrayList<ManipulationInformationContainer>(contents);
+    this.contents = new ArrayList<>(contents);
   }
 
   public Individual(Individual individual) {

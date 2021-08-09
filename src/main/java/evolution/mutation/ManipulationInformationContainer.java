@@ -7,7 +7,7 @@ import java.util.Map;
 
 /**
  * This class encapsulates information necessary to manipulate an original files.
- * Contains the Path to the original file, the contents as a List of Strings and a list of manipulatable lines.
+ * Contains the Path to the original file, and the manipulated lines and their line numbers in a map.
  */
 public class ManipulationInformationContainer {
   /**
@@ -40,10 +40,6 @@ public class ManipulationInformationContainer {
     if (this.manipulations.containsKey(line)) {
       this.manipulations.put(line, content);
     }
-  }
-
-  public int getSize() {
-    return this.manipulations.size();
   }
 
   public Path getPath() {

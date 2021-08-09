@@ -14,7 +14,7 @@ public class CompilerArguments {
   private final List<String> tests;
 
   public CompilerArguments() {
-    Scanner scn = new Scanner(System.in);
+    // Scanner scn = new Scanner(System.in);
     // output, flags and variants are not used for the evaluation using scrcpy
     // System.out.println("Enter your out path");
     this.output = "";
@@ -26,7 +26,7 @@ public class CompilerArguments {
                                        "\nOne line equals to one variant. " +
                                        "The program will automatically define the TEST macro." +
                                        "Entering an empty string will stop the loop");
-    this.tests = new ArrayList<String>(); // TODO sollte eingelesen werden
+    this.tests = new ArrayList<>(); // TODO sollte eingelesen werden
     tests.add("/home/leon/IdeaProjects/C-MergeOPtimizer/optimize/scrcpy/x/app/test_control_event_serialize");
   }
 
